@@ -1,0 +1,103 @@
+.text-type {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 100%;
+    line-height: 1.5;
+}
+
+.text-type__content {
+    white-space: nowrap;
+    display: inline;
+}
+
+.text-type__cursor {
+    display: inline;
+    margin-left: 1px;
+}
+
+.text-type__cursor--hidden {
+    visibility: hidden;
+}
+
+/* ── RESPONSIVE ── */
+/* Large Desktop: > 1440px */
+@media (min-width: 1441px) {
+    .text-type {
+        font-size: 3.1em;
+    }
+}
+
+/* Desktop: 1025px - 1440px */
+@media (min-width: 1025px) and (max-width: 1440px) {
+    .text-type {
+        font-size: 1em;
+    }
+}
+
+/* Tablet Landscape: 1024px */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .text-type {
+        font-size: 0.95em;
+    }
+}
+
+/* Tablet Portrait / Mobile Landscape: 768px */
+@media (max-width: 768px) {
+    .text-type {
+        font-size: 0.9em;
+        white-space: normal;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .text-type__content {
+        white-space: normal;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+}
+
+/* Mobile: 480px - 768px */
+@media (max-width: 768px) and (min-width: 481px) {
+    .text-type {
+        font-size: 0.9em;
+    }
+}
+
+/* Small Mobile: ≤ 480px */
+@media (max-width: 480px) {
+    .text-type {
+        font-size: 0.85em;
+    }
+}
+
+/* Extra Small: ≤ 360px */
+@media (max-width: 360px) {
+    .text-type {
+        font-size: 0.8em;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .text-type__cursor {
+        animation: none !important;
+        opacity: 1 !important;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .text-type__cursor {
+        border-left: 2px solid currentColor;
+        margin-left: 2px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .text-type__cursor {
+        display: none;
+    }
+}

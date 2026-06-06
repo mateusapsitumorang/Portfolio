@@ -1,0 +1,16 @@
+.light-rays-container {
+  position: fixed; 
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  
+  z-index: -1; /* UBAH KE -1 (Di depan Jaring-jaring yang -2, tapi di bawah konten) */
+  pointer-events: none;
+}
+
+.light-rays-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}

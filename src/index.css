@@ -1,0 +1,381 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #050505;
+  color: #ffffff;
+  overflow-x: hidden;
+  min-width: 0;
+  line-height: 1.5;
+}
+
+/* Memperbaiki root agar full-screen */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 100px 20px;
+  position: relative;
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+section {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+h2.section-title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  text-align: center;
+  margin-bottom: clamp(30px, 5vw, 50px);
+  background: linear-gradient(90deg, #38bdf8, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+/* Style Khusus untuk BlurText "Selamat Datang" */
+.welcome-text {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: #ffffff;
+  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  word-break: break-word;
+}
+
+/* Memastikan semua section mengikuti lebar yang sama */
+section {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+/* Prevent horizontal scroll on all elements */
+img,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Fix for flex/grid overflow */
+.flex,
+.grid,
+[class*="flex"],
+[class*="grid"] {
+  min-width: 0;
+}
+
+/* Ensure text doesn't overflow */
+p,
+span,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a,
+li {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+/* ── Gap antar section ── */
+.container {
+  padding-top: 120px;
+  /* jarak atas — ubah sesuai selera */
+  padding-bottom: 120px;
+  /* jarak bawah */
+}
+
+@media (max-width: 1024px) {
+  .container {
+    padding-top: 90px;
+    padding-bottom: 90px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding-top: 70px;
+    padding-bottom: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding-top: 50px;
+    padding-bottom: 50px;
+  }
+}
+
+/* ── CV iframe height ── */
+.cv-iframe {
+  height: 600px;
+}
+
+@media (max-width: 1024px) {
+  .cv-iframe {
+    height: 900px;
+  }
+}
+
+@media (max-width: 768px) {
+  .cv-iframe {
+    height: 700px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cv-iframe {
+    height: 500px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+/* Large Desktop: > 1440px */
+@media (min-width: 1441px) {
+  .container {
+    max-width: 1200px;
+    padding: 80px 120px;
+  }
+
+  section {
+    max-width: 1200px;
+    padding: 0 40px;
+  }
+
+  h2.section-title {
+    font-size: clamp(2.5rem, 4vw, 4rem);
+  }
+
+  .welcome-text {
+    font-size: clamp(2.5rem, 4vw, 4rem);
+  }
+}
+
+/* Desktop: 1025px - 1440px */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .container {
+    max-width: 1100px;
+    padding: 100px 30px;
+  }
+
+  section {
+    max-width: 1100px;
+    padding: 0 30px;
+  }
+}
+
+/* Tablet Landscape: 1024px */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .container {
+    max-width: 100%;
+    padding: 80px 24px;
+  }
+
+  section {
+    max-width: 100%;
+    padding: 0 24px;
+  }
+
+  h2.section-title {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    margin-bottom: clamp(24px, 4vw, 40px);
+  }
+
+  .welcome-text {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+  }
+}
+
+/* Tablet Portrait / Mobile Landscape: 768px */
+@media (max-width: 768px) {
+  .container {
+    padding: 60px 16px;
+  }
+
+  section {
+    padding: 0 16px;
+    min-height: auto;
+  }
+
+  h2.section-title {
+    font-size: clamp(1.75rem, 5vw, 2.25rem);
+    margin-bottom: clamp(20px, 4vw, 32px);
+  }
+
+  .welcome-text {
+    font-size: clamp(1.75rem, 5vw, 2.25rem);
+  }
+
+  .about-layout {
+    flex-direction: column !important;
+    text-align: center;
+    gap: 40px;
+  }
+
+  .about-text {
+    padding-right: 0 !important;
+  }
+}
+
+/* Mobile: 480px - 768px */
+@media (max-width: 768px) and (min-width: 481px) {
+  .container {
+    padding: 60px 20px;
+  }
+
+  section {
+    padding: 0 20px;
+  }
+}
+
+/* Small Mobile: ≤ 480px */
+@media (max-width: 480px) {
+  .container {
+    padding: 50px 12px;
+  }
+
+  section {
+    padding: 0 12px;
+  }
+
+  .welcome-text {
+    font-size: clamp(1.5rem, 7vw, 2rem);
+  }
+
+  h2.section-title {
+    font-size: clamp(1.3rem, 6vw, 1.8rem);
+    margin-bottom: 20px;
+  }
+}
+
+/* Extra Small: ≤ 360px */
+@media (max-width: 360px) {
+  .container {
+    padding: 40px 10px;
+  }
+
+  section {
+    padding: 0 10px;
+  }
+
+  .welcome-text {
+    font-size: clamp(1.3rem, 8vw, 1.7rem);
+  }
+
+  h2.section-title {
+    font-size: clamp(1.1rem, 7vw, 1.5rem);
+    margin-bottom: 16px;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+
+  .nav-links a:hover,
+  .nav-btn:hover,
+  .footer-links a:hover,
+  .footer-social-icon:hover,
+  .quickCard:hover,
+  .actionBtn:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Increase tap targets */
+  a,
+  button,
+  input,
+  textarea {
+    min-height: 44px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+
+  .floating-navbar,
+  .floating-footer,
+  .card-spotlight {
+    border-width: 2px;
+  }
+
+  .nav-pill {
+    background: rgba(255, 255, 255, 0.2);
+    border-width: 2px;
+  }
+}
+
+/* Print styles */
+@media print {
+
+  .floating-navbar,
+  .floating-footer,
+  .ferroLayer,
+  .logoLoopWrap {
+    display: none !important;
+  }
+
+  section {
+    min-height: auto;
+    page-break-inside: avoid;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+}
