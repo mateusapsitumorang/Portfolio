@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
   motion,
   useMotionValue,
@@ -6,24 +7,55 @@ import {
   useTransform,
 } from "motion/react";
 
-const CV_PATH = "/pdf/CV Mateus Appuwan Situmorang.pdf";
+function useReveal(threshold = 0.15) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          obs.unobserve(el);
+        }
+      },
+      { threshold },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+
+  return [ref, visible];
+}
 
 export const CV = () => {
+  const { t, i18n } = useTranslation();
+  const [headingRef, headingVisible] = useReveal(0.2);
+  const [iframeRef, iframeVisible] = useReveal(0.1);
+
+const CV_PATH = i18n.language === "id"
+    ? "/pdf/CV Mateus Appuwan Situmorang id.pdf"
+    : "/pdf/CV Mateus Appuwan Situmorang.pdf";
+
   return (
     <section id="cv" className="container">
+      {/* Heading dengan animasi */}
       <div
+        ref={headingRef}
+        className="section-title-wrapper"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          marginBottom: "2rem",
-          marginTop: "2rem",
+          opacity: headingVisible ? 1 : 0,
+          transform: headingVisible ? "translateY(0)" : "translateY(24px)",
+          transition: "opacity 0.7s ease, transform 0.7s ease",
         }}
       >
         <h2
           className="section-title"
           style={{
             margin: 0,
+            fontFamily: "Poppins, sans-serif",
             fontSize: "clamp(2.6rem, 6vw, 4.2rem)",
             fontWeight: 800,
             lineHeight: 1.08,
@@ -33,38 +65,48 @@ export const CV = () => {
             colors={["#38bdf8", "#c084fc", "#38bdf8", "#c084fc", "#38bdf8"]}
             animationSpeed={4}
           >
-            Curriculum Vitae
+            {t("cv.title")}
           </GradientText>
         </h2>
         <p
           className="exp-subtitle"
           style={{
-            color: "#ffffff",
+            fontFamily: "Poppins, sans-serif",
+            fontSize: "0.9rem",
+            fontWeight: 300,
             textAlign: "center",
-            margin: "12px auto 0",
+            color: "#ffffff",
+            lineHeight: 1.75,
+            maxWidth: "700px",
+            margin: "0 auto",
           }}
         >
-          The following is my curriculum vitae.
+          {t("cv.subtitle")}
         </p>
       </div>
 
+      {/* iframe dengan animasi, delay sedikit setelah heading */}
       <div
+        ref={iframeRef}
+        className="cv-wrapper"
         style={{
+          opacity: iframeVisible ? 1 : 0,
+          transform: iframeVisible
+            ? "translateY(0) scale(1)"
+            : "translateY(32px) scale(0.98)",
+          transition:
+            "opacity 0.6s ease 0.2s, transform 0.6s cubic-bezier(0.34,1.2,0.64,1) 0.2s",
           border: "1px solid #222",
           borderRadius: "12px",
           overflow: "hidden",
           margin: "0 auto",
           background: "#111",
-          maxWidth: "900px",
           width: "100%",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+          boxShadow: iframeVisible
+            ? "0 10px 40px rgba(56,189,248,0.08), 0 10px 30px rgba(0,0,0,0.5)"
+            : "0 10px 30px rgba(0,0,0,0.5)",
         }}
       >
-        {/* 
-          Wrapper pakai padding-bottom trick untuk aspect ratio,
-          tapi karena PDF lebih baik pakai height tetap,
-          kita pakai className dan atur di CSS global.
-        */}
         <iframe
           src={`${CV_PATH}#toolbar=1&navpanes=0&scrollbar=1&view=FitH`}
           title="CV - Mateus Appuwan Situmorang"

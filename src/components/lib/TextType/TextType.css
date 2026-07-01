@@ -24,7 +24,7 @@
 /* Large Desktop: > 1440px */
 @media (min-width: 1441px) {
     .text-type {
-        font-size: 3.1em;
+        font-size: 1.1em;
     }
 }
 
@@ -99,5 +99,34 @@
 @media print {
     .text-type__cursor {
         display: none;
+    }
+}
+
+/* ── Tambahkan ini ke TextType.css yang sudah ada ── */
+
+/* Cursor blink — CSS animation, tanpa GSAP */
+.text-type__cursor {
+    display: inline-block;
+    animation: cursorBlink var(--cursor-blink-duration, 0.5s) ease-in-out infinite alternate;
+}
+
+.text-type__cursor--hidden {
+    visibility: hidden;
+}
+
+@keyframes cursorBlink {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .text-type__cursor {
+        animation: none;
+        opacity: 1;
     }
 }

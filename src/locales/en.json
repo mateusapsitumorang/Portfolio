@@ -1,0 +1,248 @@
+{
+  "nav": {
+    "about": "About",
+    "experience": "Experience",
+    "projects": "Projects",
+    "cv": "CV",
+    "education": "Education",
+    "certificates": "Certificate",
+    "contact": "Contact"
+  },
+
+  "about": {
+    "welcome": "Hello, I'm Mateus.",
+    "heading": "I'm a",
+    "role": "System Developer.",
+    "description": "A system developer focused on quality and user experience. I build secure, scalable, and efficient full-stack applications bridging robust backend architecture with intuitive frontend experiences."
+  },
+  "experience": {
+    "label": "Experience",
+    "title": "Professional Experience",
+    "subtitle": "An overview of my career journey."
+  },
+  "experience_items": {
+    "bssn": {
+      "period": "Nov 2025 — May 2026",
+      "role": "Full-Stack Developer, System Engineer",
+      "company": "Badan Siber dan Sandi Negara (BSSN)",
+      "location": "Jakarta, Indonesia",
+      "type": "Internship",
+      "description": "Led two concurrent security projects a secure Android key-entry app and a malware analysis sandbox coordinating a 3-person dev team across planning, development, and system integration.",
+      "achievements": [
+        "Developed a Flutter/Dart Android app with secure login, user profile management, and cryptographic key-entry compliant with EAL 3 standards; all user data encrypted and user-key-protected.",
+        "Built an Automatic Malware Analyzer integrating Nginx, Docker, Python, MISP, VirusTotal, and Arkime; accurately detected WannaCry with a malscore of 10/10 while scoring benign files at 0-1/10.",
+        "Defined acceptance criteria aligned with Common Criteria and applied security-by-design across the SDLC covering access control, data flow hardening, and application hardening.",
+        "Managed team workflow via GitHub (branching, PRs, code reviews) and documented system architecture in Miro."
+      ]
+    }
+  },
+  "projects": {
+    "label": "Portfolio",
+    "title": "Featured Projects",
+    "subtitle": "Projects that highlight my technical expertise and experience."
+  },
+  "projects_items": {
+    "komanstra": {
+      "title": "Secure Key-Entry App",
+      "subtitle": "Hardware-Integrated Cryptographic Security App",
+      "category": "Android Development",
+      "fullDesc": "Secure Ht Box is a high-security Android-based (cross-platform) mobile application developed using the Flutter framework. This application is specifically designed as a secure interface for managing, injecting, and synchronizing cryptographic data/keys to external hardware (STM32 microcontrollers) directly via USB Serial communication.",
+      "info": [
+        { "label": "Status", "value": "Restricted" },
+        { "label": "Type", "value": "Android App" },
+        { "label": "Duration", "value": "2 Months" },
+        { "label": "Role", "value": "Full-Stack Mobile Developer" }
+      ]
+    },
+    "analyzer": {
+      "title": "Automatic Malware Analyzer",
+      "subtitle": "Security Sandbox Platform",
+      "category": "Full-Stack & Cybersecurity",
+      "fullDesc": "Automatic Malware Analyzer is an advanced automated malware analysis platform designed for in-depth extraction, behavioral classification, and threat identification within a sandboxed environment. It is built to dynamically analyze suspicious files and links, integrating layered virtualization with a threat intelligence management system to generate accurate Indicators of Compromise (IoC).",
+      "info": [
+        { "label": "Status", "value": "Restricted" },
+        { "label": "Type", "value": "Web App & System Infrastructure" },
+        { "label": "Duration", "value": "4 Months" },
+        { "label": "Role", "value": "System Engineer" }
+      ]
+    },
+    "yogtrip": {
+      "title": "YogTrip",
+      "subtitle": "Yogyakarta Travel Recommendation System",
+      "category": "Full-Stack Development",
+      "fullDesc": "A hybrid recommendation system based on Knowledge Graph and Path Ranking Algorithm (PRA). Integrating MySQL and Neo4j for graph data modeling and personalized travel recommendations.",
+      "info": [
+        { "label": "Status", "value": "Not Live" },
+        { "label": "Type", "value": "Web Application" },
+        { "label": "Duration", "value": "6 Months" },
+        { "label": "Role", "value": "Full-Stack Developer" }
+      ]
+    },
+    "localine": {
+      "title": "LOCALINE",
+      "subtitle": "Web System Development (Union in Technology)",
+      "category": "Web Development",
+      "fullDesc": "A React-based web platform to support UMKM digitalization and expand market access. Produced a competition-ready product that won third place at IT Days 2024.",
+      "info": [
+        { "label": "Status", "value": "Not Live" },
+        { "label": "Type", "value": "Web Application" },
+        { "label": "Duration", "value": "2 Months" },
+        { "label": "Role", "value": "Frontend Developer" }
+      ]
+    }
+  },
+  "projects_ui": {
+    "view_details": "View Details →",
+    "preview": "Preview",
+    "preview_unavailable": "Not Available",
+    "description": "Description",
+    "tech_stack": "Tech Stack",
+    "project_details": "Project Details",
+    "live_demo": "Live Demo",
+    "repositories": "Repositories",
+    "not_live_tooltip": "Project is not live",
+    "private_repo_tooltip": "Source code is confidential"
+  },
+  "cv": {
+    "label": "Curriculum Vitae",
+    "title": "Curriculum Vitae",
+    "subtitle": "A summary of my education, experience, and skills."
+  },
+  "education": {
+    "label": "Education",
+    "title": "Educational background",
+    "subtitle": "The academic journey I have taken."
+  },
+  "education_items": [
+    {
+      "date": "2021 - 2025",
+      "position": "Sanata Dharma University",
+      "companyName": "Sleman, Special Region of Yogyakarta"
+    },
+    {
+      "date": "2018 - 2021",
+      "position": "Public Senior High School 02 Dente Teladas",
+      "companyName": "Tulang Bawang, Lampung"
+    },
+    {
+      "date": "2015 - 2018",
+      "position": "Public Junior High School 01 Dente Teladas",
+      "companyName": "Tulang Bawang, Lampung"
+    },
+    {
+      "date": "2009 - 2015",
+      "position": "Public Elementary School 01 Pendowo Asri",
+      "companyName": "Tulang Bawang, Lampung"
+    }
+  ],
+  "certificates": {
+    "label": "Certificate",
+    "title": "Certificate",
+    "subtitle": "Following are the certificates and achievements I have obtained."
+  },
+  "certificates_items": {
+    "cert20": {
+      "title": "BSSN Internship",
+      "date": "June 2026"
+    },
+    "cert19": {
+      "title": "Integrity at Work",
+      "date": "June 2026"
+    },
+    "cert18": {
+      "title": "Emotional Resilience",
+      "date": "June 2026"
+    },
+    "cert17": {
+      "title": "Skills: Adaptability",
+      "date": "June 2026"
+    },
+    "cert16": {
+      "title": "Self Efficacy",
+      "date": "June 2026"
+    },
+    "cert15": {
+      "title": "Digital Literacy",
+      "date": "June 2026"
+    },
+    "cert14": {
+      "title": "Social Influence",
+      "date": "June 2026"
+    },
+    "cert13": {
+      "title": "Emotional Intelligence",
+      "date": "March 2026"
+    },
+    "cert12": {
+      "title": "Digital Disruption & Transformation",
+      "date": "January 2026"
+    },
+    "cert11": {
+      "title": "Design Thinking",
+      "date": "December 2025"
+    },
+    "cert10": {
+      "title": "Programming for Everyone (Getting Started with Python)",
+      "date": "July 2025"
+    },
+    "cert9": {
+      "title": "CSSLP Masterclass — Secure Software Development",
+      "date": "July 2025"
+    },
+    "cert8": {
+      "title": "SAP01 — SAP Overview",
+      "date": "June 2025"
+    },
+    "cert7": {
+      "title": "Python Basic — HackerRank",
+      "date": "October 2024"
+    },
+    "cert6": {
+      "title": "3rd Place — Web Development IT Days",
+      "date": "October 2024"
+    },
+    "cert5": {
+      "title": "Kuliah Kerja Nyata (KKN)",
+      "date": "July 2024"
+    },
+    "cert4": {
+      "title": "USD Initiation Committee",
+      "date": "September 2023"
+    },
+    "cert3": {
+      "title": "Student Executive Board — Faculty of Science & Technology",
+      "date": "December 2023"
+    },
+    "cert2": {
+      "title": "Environmental Awareness (DARLING) — Faculty of Science & Technology",
+      "date": "September 2023"
+    },
+    "cert1": {
+      "title": "General Election Commission — BEM Faculty of Science & Technology",
+      "date": "October 2022"
+    }
+  },
+  "contact": {
+    "label": "Contact",
+    "title": "Get in Touch",
+    "subtitle": "Have a question or want to collaborate? Reach out anytime.",
+    "subtitle_line1": "Have a question or project in mind?",
+    "subtitle_line2": "Choose the most convenient way to reach me.",
+    "leave_message": "Leave a Message",
+    "name_placeholder": "Your name...",
+    "message_placeholder": "Write your message...",
+    "send_message_title": "Send a Message",
+    "send_message_sub_line1": "Have a question or project?",
+    "send_message_sub_line2": "Reach me via WhatsApp or email.",
+    "wa_label": "Chat directly",
+    "email_label": "Send an email",
+    "form_name": "Name",
+    "form_name_placeholder": "Your name",
+    "form_message": "Message",
+    "form_message_placeholder": "Write your message here...",
+    "success_message": "Message sent!"
+  },
+  "footer": {
+    "description": "Building secure, scalable, and high-performance digital solutions crafted with passion, driven by curiosity, and powered by clean, reliable code."
+  }
+}

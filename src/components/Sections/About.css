@@ -1,0 +1,170 @@
+/* D:\Project\portfolio\src\components\Sections\About.css */
+
+.about-section {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    padding: 0 48px;
+}
+
+.about-inner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 100px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1100px;
+}
+
+.about-text {
+    flex: 0 0 550px;
+    width: 550px;
+    min-width: 0;
+    text-align: left;
+}
+
+.about-welcome-wrap {
+    width: 100%;
+    overflow: hidden;
+    font-size: 2.4rem;
+}
+
+.about-heading {
+    font-size: 1.8rem;
+    color: #e5e7eb;
+    font-weight: 600;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-start;
+    margin: 16px 0 0 0;
+    white-space: nowrap;
+}
+
+.about-role {
+    color: #38bdf8;
+    white-space: nowrap;
+}
+
+.about-description {
+    margin-top: 10px;
+    color: #9ca3af;
+    text-align: left;
+    line-height: 1.65;
+}
+
+.about-photo-mobile {
+    display: none;
+    justify-content: center;
+    width: 100%;
+}
+
+.about-photo-desktop {
+    display: flex;
+    flex: 0 0 auto;
+    justify-content: center;
+    align-items: center;
+}
+
+/* lg */
+@media (max-width: 1279px) {
+    .about-inner {
+        gap: 72px;
+        max-width: 960px;
+    }
+
+    .about-text {
+        flex: 0 0 500px;
+        width: 500px;
+    }
+
+    .about-welcome-wrap {
+        font-size: 2.2rem;
+    }
+
+    .about-heading {
+        font-size: 1.7rem;
+    }
+}
+
+/* md (tablet) — foto tetap di kanan */
+@media (max-width: 1023px) {
+    .about-section {
+        padding: 0 32px;
+    }
+
+    .about-inner {
+        gap: 48px;
+        max-width: 900px;
+    }
+
+    .about-text {
+        flex: 0 0 420px;
+        width: 420px;
+    }
+
+    .about-welcome-wrap {
+        font-size: 2rem;
+    }
+
+    .about-heading {
+        font-size: 1.55rem;
+    }
+}
+
+/* sm + xs — layout kolom, foto di atas */
+@media (max-width: 767px) {
+    .about-section {
+        padding: 80px 20px 40px;
+    }
+
+    .about-inner {
+        flex-direction: column;
+        gap: 24px;
+        max-width: 100%;
+    }
+
+    .about-text {
+        flex: none;
+        width: 100%;
+    }
+
+    .about-welcome-wrap {
+        font-size: 1.85rem;
+    }
+
+    .about-heading {
+        font-size: 1.4rem;
+        flex-wrap: wrap;
+        white-space: normal;
+    }
+
+    .about-photo-mobile {
+        display: flex;
+    }
+
+    .about-photo-desktop {
+        display: none;
+    }
+}
+
+@media (max-width: 479px) {
+    .about-section {
+        padding: 80px 16px 40px;
+    }
+
+    .about-welcome-wrap {
+        font-size: 1.6rem;
+    }
+
+    .about-heading {
+        font-size: 1.25rem;
+    }
+}

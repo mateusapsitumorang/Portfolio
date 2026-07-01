@@ -1,0 +1,247 @@
+{
+  "nav": {
+    "about": "Tentang",
+    "experience": "Pengalaman",
+    "projects": "Proyek",
+    "cv": "CV",
+    "education": "Pendidikan",
+    "certificates": "Sertifikat",
+    "contact": "Kontak"
+  },
+  "about": {
+    "welcome": "Halo, saya Mateus.",
+    "heading": "Saya",
+    "role": "System Developer.",
+    "description": "System Developer yang mengutamakan kualitas dan pengalaman pengguna. Saya berfokus membangun aplikasi full-stack yang aman, skalabel, dan efisien menjembatani arsitektur backend yang andal dengan frontend yang intuitif."
+  },
+  "experience": {
+    "label": "Karier",
+    "title": "Pengalaman Profesional",
+    "subtitle": "Gambaran perjalanan karier profesional saya."
+  },
+  "experience_items": {
+    "bssn": {
+      "period": "Nov 2025 — Mei 2026",
+      "role": "Full-Stack Developer, System Engineer",
+      "company": "Badan Siber dan Sandi Negara (BSSN)",
+      "location": "Jakarta, Indonesia",
+      "type": "Magang",
+      "description": "Memimpin dua proyek keamanan secara simultan, yaitu aplikasi Android untuk entri kunci yang aman dan sandbox analisis malware, dengan mengoordinasikan tim pengembang beranggotakan tiga orang dalam perencanaan, pengembangan, dan integrasi sistem.",
+      "achievements": [
+        "Mengembangkan aplikasi Android menggunakan Flutter dan Dart dengan fitur login aman, manajemen profil pengguna, serta entri kunci kriptografi yang memenuhi standar EAL 3. Seluruh data pengguna dienkripsi dan dilindungi menggunakan kunci pengguna.",
+        "Membangun Automated Malware Analyzer yang mengintegrasikan Nginx, Docker, Python, MISP, VirusTotal, dan Arkime. Sistem berhasil mendeteksi WannaCry dengan skor malware 10/10, sementara file yang tidak berbahaya memperoleh skor 0-1/10.",
+        "Menetapkan kriteria penerimaan yang selaras dengan Common Criteria dan menerapkan pendekatan security by design di seluruh SDLC, termasuk kontrol akses, pengamanan aliran data, dan penguatan keamanan aplikasi.",
+        "Mengelola alur kerja tim melalui GitHub menggunakan branching, pull request, dan code review, serta mendokumentasikan arsitektur sistem menggunakan Miro."
+      ]
+    }
+  },
+  "projects": {
+    "label": "Portofolio",
+    "title": "Proyek Unggulan",
+    "subtitle": "Proyek yang mencerminkan keahlian dan pengalaman saya."
+  },
+  "projects_items": {
+    "komanstra": {
+      "title": "Secure Key-Entry App",
+      "subtitle": "Aplikasi Keamanan Kriptografi Terintegrasi",
+      "category": "Pengembangan Android",
+      "fullDesc": "Secure Key-Entry App adalah aplikasi seluler berkeamanan tinggi berbasis Android (lintas platform) yang dikembangkan menggunakan framework Flutter. Aplikasi ini dirancang khusus sebagai antarmuka yang aman untuk mengelola, menyuntikkan, dan menyinkronkan data/kunci kriptografi ke perangkat keras eksternal (mikrokontroler STM32) secara langsung melalui komunikasi USB Serial.",
+      "info": [
+        { "label": "Status", "value": "Terbatas" },
+        { "label": "Tipe", "value": "Aplikasi Android" },
+        { "label": "Durasi", "value": "2 Bulan" },
+        { "label": "Peran", "value": "Full-Stack Mobile Developer" }
+      ]
+    },
+    "analyzer": {
+      "title": "Automatic Malware Analyzer",
+      "subtitle": "Platform Sandbox Keamanan",
+      "category": "Full-Stack & Keamanan Siber",
+      "fullDesc": "Automatic Malware Analyzer adalah platform analisis malware otomatis tingkat lanjut yang dirancang untuk melakukan ekstraksi mendalam, klasifikasi perilaku, dan identifikasi ancaman di dalam lingkungan terisolasi (sandbox). Platform ini dibangun untuk menganalisis berkas dan tautan mencurigakan secara dinamis, mengintegrasikan virtualisasi berlapis dengan sistem manajemen intelijen ancaman guna menghasilkan Indicator of Compromise (IoC) yang akurat.",
+      "info": [
+        { "label": "Status", "value": "Terbatas" },
+        { "label": "Tipe", "value": "Aplikasi Web & Infrastruktur Sistem" },
+        { "label": "Durasi", "value": "4 Bulan" },
+        { "label": "Peran", "value": "System Engineer" }
+      ]
+    },
+    "yogtrip": {
+      "title": "YogTrip",
+      "subtitle": "Sistem Rekomendasi Wisata Yogyakarta",
+      "category": "Pengembangan Full-Stack",
+      "fullDesc": "Sistem rekomendasi hybrid berbasis Knowledge Graph dan Path Ranking Algorithm (PRA). Mengintegrasikan MySQL dan Neo4j untuk pemodelan data grafik dan rekomendasi perjalanan yang dipersonalisasi.",
+      "info": [
+        { "label": "Status", "value": "Tidak Live" },
+        { "label": "Tipe", "value": "Aplikasi Web" },
+        { "label": "Durasi", "value": "6 Bulan" },
+        { "label": "Peran", "value": "Full-Stack Developer" }
+      ]
+    },
+    "localine": {
+      "title": "LOCALINE",
+      "subtitle": "Pengembangan Web (Union in Technology)",
+      "category": "Pengembangan Web",
+      "fullDesc": "Platform web berbasis React untuk mendukung digitalisasi UMKM dan perluasan akses pasar. Menghasilkan produk siap kompetisi yang meraih juara 3 di IT Days 2024.",
+      "info": [
+        { "label": "Status", "value": "Tidak Live" },
+        { "label": "Tipe", "value": "Aplikasi Web" },
+        { "label": "Durasi", "value": "2 Bulan" },
+        { "label": "Peran", "value": "Frontend Developer" }
+      ]
+    }
+  },
+  "projects_ui": {
+    "view_details": "Lihat Detail →",
+    "preview": "Pratinjau",
+    "preview_unavailable": "Tidak Tersedia",
+    "description": "Deskripsi",
+    "tech_stack": "Teknologi",
+    "project_details": "Detail Proyek",
+    "live_demo": "Demo Langsung",
+    "repositories": "Repositori",
+    "not_live_tooltip": "Proyek tidak aktif",
+    "private_repo_tooltip": "Kode bersifat rahasia"
+  },
+  "cv": {
+    "label": "CV",
+    "title": "Daftar Riwayat Hidup",
+    "subtitle": "Ringkasan pendidikan, pengalaman, dan keterampilan saya."
+  },
+  "education": {
+    "label": "Edukasi",
+    "title": "Riwayat Pendidikan",
+    "subtitle": "Perjalanan akademik yang telah saya tempuh."
+  },
+  "education_items": [
+    {
+      "date": "2021 - 2025",
+      "position": "Universitas Sanata Dharma",
+      "companyName": "Sleman, Daerah Istimewa Yogyakarta"
+    },
+    {
+      "date": "2018 - 2021",
+      "position": "SMA Negeri 2 Dente Teladas",
+      "companyName": "Tulang Bawang, Lampung"
+    },
+    {
+      "date": "2015 - 2018",
+      "position": "SMP Negeri 1 Dente Teladas",
+      "companyName": "Tulang Bawang, Lampung"
+    },
+    {
+      "date": "2009 - 2015",
+      "position": "SD Negeri 1 Pendowo Asri",
+      "companyName": "Tulang Bawang, Lampung"
+    }
+  ],
+  "certificates": {
+    "label": "Sertifikat",
+    "title": "Sertifikat",
+    "subtitle": "Berikut sertifikat dan pencapaian yang saya peroleh"
+  },
+  "certificates_items": {
+    "cert20": {
+      "title": "Magang BSSN",
+      "date": "Juni 2026"
+    },
+    "cert19": {
+      "title": "Integritas di Tempat Kerja",
+      "date": "Juni 2026"
+    },
+    "cert18": {
+      "title": "Ketahanan Emosional",
+      "date": "Juni 2026"
+    },
+    "cert17": {
+      "title": "Adaptabilitas",
+      "date": "Juni 2026"
+    },
+    "cert16": {
+      "title": "Efikasi Diri",
+      "date": "Juni 2026"
+    },
+    "cert15": {
+      "title": "Literasi Digital",
+      "date": "Juni 2026"
+    },
+    "cert14": {
+      "title": "Pengaruh Sosial",
+      "date": "Juni 2026"
+    },
+    "cert13": {
+      "title": "Kecerdasan Emosional",
+      "date": "Maret 2026"
+    },
+    "cert12": {
+      "title": "Disrupsi & Transformasi Digital",
+      "date": "Januari 2026"
+    },
+    "cert11": {
+      "title": "Design Thinking",
+      "date": "Desember 2025"
+    },
+    "cert10": {
+      "title": "Programming for Everyone (Getting Started with Python)",
+      "date": "Juli 2025"
+    },
+    "cert9": {
+      "title": "CSSLP Masterclass — Secure Software Development",
+      "date": "Juli 2025"
+    },
+    "cert8": {
+      "title": "SAP01 — SAP Overview",
+      "date": "Juni 2025"
+    },
+    "cert7": {
+      "title": "Python Basic — HackerRank",
+      "date": "Oktober 2024"
+    },
+    "cert6": {
+      "title": "Juara 3 — Web Development IT Days",
+      "date": "Oktober 2024"
+    },
+    "cert5": {
+      "title": "Kuliah Kerja Nyata (KKN)",
+      "date": "Juli 2024"
+    },
+    "cert4": {
+      "title": "Panitia Inisiasi Universitas Sanata Dharma",
+      "date": "September 2023"
+    },
+    "cert3": {
+      "title": "BEM Fakultas Sains dan Teknologi",
+      "date": "Desember 2023"
+    },
+    "cert2": {
+      "title": "Sadar Lingkungan (DARLING) — Fak. Sains & Teknologi",
+      "date": "September 2023"
+    },
+    "cert1": {
+      "title": "Komisi Pemilihan Umum BEM — Fak. Sains & Teknologi",
+      "date": "Oktober 2022"
+    }
+  },
+  "contact": {
+    "label": "Kontak",
+    "title": "Hubungi Saya",
+    "subtitle": "Ada pertanyaan atau ingin bekerja sama? Saya siap dihubungi.",
+    "subtitle_line1": "Ada pertanyaan atau proyek?",
+    "subtitle_line2": "Pilih cara yang paling mudah untuk menghubungi saya.",
+    "leave_message": "Tinggalkan Pesan",
+    "name_placeholder": "Nama kamu...",
+    "message_placeholder": "Tulis pesanmu...",
+    "send_message_title": "Kirim Pesan",
+    "send_message_sub_line1": "Ada pertanyaan atau proyek?",
+    "send_message_sub_line2": "Hubungi via WhatsApp atau email.",
+    "wa_label": "Chat langsung",
+    "email_label": "Kirim email",
+    "form_name": "Nama",
+    "form_name_placeholder": "Nama kamu",
+    "form_message": "Pesan",
+    "form_message_placeholder": "Tulis pesanmu di sini...",
+    "success_message": "Pesan berhasil dikirim!"
+  },
+  "footer": {
+    "description": "Membangun solusi digital yang aman, skalabel, dan handal dengan kode bersih dan pengalaman bermakna yang mendukung pertumbuhan jangka panjang."
+  }
+}

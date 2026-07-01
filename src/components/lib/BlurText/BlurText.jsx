@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState, useMemo } from "react";
 
+// Dipindah ke luar — tidak perlu dibuat ulang tiap render
 const buildKeyframes = (from, steps) => {
   const keys = new Set([
     ...Object.keys(from),
     ...steps.flatMap((s) => Object.keys(s)),
   ]);
-
   const keyframes = {};
   keys.forEach((k) => {
     keyframes[k] = [from[k], ...steps.map((s) => s[k])];
@@ -28,7 +28,6 @@ const BlurText = ({
   onAnimationComplete,
   stepDuration = 0.35,
 }) => {
-  const elements = animateBy === "words" ? text.split(" ") : text.split("");
   const [inView, setInView] = useState(false);
   const ref = useRef(null);
 
@@ -38,7 +37,7 @@ const BlurText = ({
       ([entry]) => {
         if (entry.isIntersecting) {
           setInView(true);
-          observer.unobserve(ref.current);
+          observer.disconnect(); // langsung disconnect, tidak perlu unobserve
         }
       },
       { threshold, rootMargin },
@@ -46,6 +45,12 @@ const BlurText = ({
     observer.observe(ref.current);
     return () => observer.disconnect();
   }, [threshold, rootMargin]);
+
+  // Pisah split dari render — tidak perlu dibuat ulang kecuali text/animateBy berubah
+  const elements = useMemo(
+    () => (animateBy === "words" ? text.split(" ") : text.split("")),
+    [text, animateBy],
+  );
 
   const defaultFrom = useMemo(
     () =>
@@ -57,11 +62,7 @@ const BlurText = ({
 
   const defaultTo = useMemo(
     () => [
-      {
-        filter: "blur(5px)",
-        opacity: 0.5,
-        y: direction === "top" ? 5 : -5,
-      },
+      { filter: "blur(5px)", opacity: 0.5, y: direction === "top" ? 5 : -5 },
       { filter: "blur(0px)", opacity: 1, y: 0 },
     ],
     [direction],
@@ -70,11 +71,16 @@ const BlurText = ({
   const fromSnapshot = animationFrom ?? defaultFrom;
   const toSnapshots = animationTo ?? defaultTo;
 
-  const stepCount = toSnapshots.length + 1;
-  const totalDuration = stepDuration * (stepCount - 1);
-  const times = Array.from({ length: stepCount }, (_, i) =>
-    stepCount === 1 ? 0 : i / (stepCount - 1),
-  );
+  // Hitung keyframes & timing sekali — bukan di dalam .map()
+  const { animateKeyframes, stepCount, totalDuration, times } = useMemo(() => {
+    const kf = buildKeyframes(fromSnapshot, toSnapshots);
+    const sc = toSnapshots.length + 1;
+    const td = stepDuration * (sc - 1);
+    const t = Array.from({ length: sc }, (_, i) =>
+      sc === 1 ? 0 : i / (sc - 1),
+    );
+    return { animateKeyframes: kf, stepCount: sc, totalDuration: td, times: t };
+  }, [fromSnapshot, toSnapshots, stepDuration]);
 
   return (
     <p
@@ -82,32 +88,26 @@ const BlurText = ({
       className={className}
       style={{ display: "flex", flexWrap: "wrap" }}
     >
-      {elements.map((segment, index) => {
-        const animateKeyframes = buildKeyframes(fromSnapshot, toSnapshots);
-
-        const spanTransition = {
-          duration: totalDuration,
-          times,
-          delay: (index * delay) / 1000,
-        };
-        spanTransition.ease = easing;
-
-        return (
-          <motion.span
-            className="inline-block will-change-[transform,filter,opacity]"
-            key={index}
-            initial={fromSnapshot}
-            animate={inView ? animateKeyframes : fromSnapshot}
-            transition={spanTransition}
-            onAnimationComplete={
-              index === elements.length - 1 ? onAnimationComplete : undefined
-            }
-          >
-            {segment === " " ? "\u00A0" : segment}
-            {animateBy === "words" && index < elements.length - 1 && "\u00A0"}
-          </motion.span>
-        );
-      })}
+      {elements.map((segment, index) => (
+        <motion.span
+          className="inline-block will-change-[transform,filter,opacity]"
+          key={index}
+          initial={fromSnapshot}
+          animate={inView ? animateKeyframes : fromSnapshot}
+          transition={{
+            duration: totalDuration,
+            times,
+            delay: (index * delay) / 1000,
+            ease: easing,
+          }}
+          onAnimationComplete={
+            index === elements.length - 1 ? onAnimationComplete : undefined
+          }
+        >
+          {segment === " " ? "\u00A0" : segment}
+          {animateBy === "words" && index < elements.length - 1 && "\u00A0"}
+        </motion.span>
+      ))}
     </p>
   );
 };

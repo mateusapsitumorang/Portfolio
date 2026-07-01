@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
   motion,
   useMotionValue,
@@ -10,17 +11,17 @@ import LogoLoop from "../lib/LogoLoop/LogoLoop";
 import "../lib/LogoLoop/LogoLoop.css";
 import Footer from "../layout/Footer";
 
-import ArkimeLogo from "../../assets/logo/Arkime.png";
-import GuacamoleLogo from "../../assets/logo/Guacamole.png";
-import MISPLogo from "../../assets/logo/MISP.png";
-import MobsfLogo from "../../assets/logo/Mobsf.png";
-import QemuLogo from "../../assets/logo/Qemu.png";
-import VMLogo from "../../assets/logo/VM.png";
+import ArkimeLogo from "../../assets/logo/Arkime.webp";
+import GuacamoleLogo from "../../assets/logo/Guacamole.webp";
+import MISPLogo from "../../assets/logo/MISP.webp";
+import MobsfLogo from "../../assets/logo/Mobsf.webp";
+import QemuLogo from "../../assets/logo/Qemu.webp";
+import VMLogo from "../../assets/logo/VM.webp";
 
-import PhotoshopLogo from "../../assets/logo/Photoshop.png";
-import PremiereLogo from "../../assets/logo/Premiere.png";
-import WordLogo from "../../assets/logo/Word.png";
-import ExcelLogo from "../../assets/logo/Excel.png";
+import PhotoshopLogo from "../../assets/logo/Photoshop.webp";
+import PremiereLogo from "../../assets/logo/Premiere.webp";
+import WordLogo from "../../assets/logo/Word.webp";
+import ExcelLogo from "../../assets/logo/Excel.webp";
 
 import {
   SiFlutter,
@@ -42,17 +43,24 @@ import {
   SiReact,
   SiTailwindcss,
   SiGithub,
-  //SiAdobepremierepro,
-  // SiAdobephotoshop,
-  // SiLibvirt,
-  // SiVirustotal,
 } from "react-icons/si";
+
+import { db } from "../lib/firebase";
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  serverTimestamp,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 
 const WA_NUMBER = "628992152017";
 const EMAIL_TO = "mateusapsitumorang@gmail.com";
 const STORAGE_KEY = "contact_chat_messages";
 
-// Style seragam untuk memastikan gambar PNG ukurannya pas dengan React Icons
 const iconStyle = { width: "auto", objectFit: "contain", display: "block" };
 
 const techLogos = [
@@ -75,10 +83,6 @@ const techLogos = [
   { node: <SiReact />, title: "React" },
   { node: <SiTailwindcss />, title: "Tailwind CSS" },
   { node: <SiGithub />, title: "Github" },
-
-  // --- LOGO CUSTOM (Daphne menggunakan URL karena tidak ada di daftar folder Anda) ---
-
-  // --- LOGO DARI ASSETS LOKAL ---
   {
     node: <img src={QemuLogo} alt="KVM/QEMU" style={iconStyle} />,
     title: "KVM/QEMU",
@@ -92,7 +96,7 @@ const techLogos = [
     title: "MISP",
   },
   {
-    node: <img src={MobsfLogo} alt="MobSF" style={{ iconStyle }} />,
+    node: <img src={MobsfLogo} alt="MobSF" style={iconStyle} />,
     title: "MobSF",
   },
   {
@@ -103,7 +107,6 @@ const techLogos = [
     node: <img src={GuacamoleLogo} alt="Apache Guacamole" style={iconStyle} />,
     title: "Apache Guacamole",
   },
-
   {
     node: <img src={PhotoshopLogo} alt="Adobe Photoshop" style={iconStyle} />,
     title: "Adobe Photoshop",
@@ -122,10 +125,39 @@ const techLogos = [
   },
 ];
 
+function useReveal(threshold = 0.15) {
+  const ref = useRef(null);
+  const isMobile = window.innerWidth < 768;
+  const [visible, setVisible] = useState(isMobile);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          obs.unobserve(el);
+        }
+      },
+      {
+        threshold,
+        rootMargin: "0px 0px -50px 0px", // ← tambahkan ini
+      },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+
+  return [ref, visible];
+}
+
 function GradientText({
   children,
+  className = "",
   colors = ["#38bdf8", "#c084fc", "#38bdf8", "#c084fc", "#38bdf8"],
   animationSpeed = 4,
+  showBorder = false,
   pauseOnHover = false,
   yoyo = true,
 }) {
@@ -144,17 +176,18 @@ function GradientText({
       lastTimeRef.current = time;
       return;
     }
-    const delta = time - lastTimeRef.current;
+    const deltaTime = time - lastTimeRef.current;
     lastTimeRef.current = time;
-    elapsedRef.current += delta;
+    elapsedRef.current += deltaTime;
     if (yoyo) {
       const fullCycle = animationDuration * 2;
-      const ct = elapsedRef.current % fullCycle;
-      progress.set(
-        ct < animationDuration
-          ? (ct / animationDuration) * 100
-          : 100 - ((ct - animationDuration) / animationDuration) * 100,
-      );
+      const cycleTime = elapsedRef.current % fullCycle;
+      if (cycleTime < animationDuration)
+        progress.set((cycleTime / animationDuration) * 100);
+      else
+        progress.set(
+          100 - ((cycleTime - animationDuration) / animationDuration) * 100,
+        );
     } else {
       progress.set((elapsedRef.current / animationDuration) * 100);
     }
@@ -164,25 +197,47 @@ function GradientText({
     elapsedRef.current = 0;
     progress.set(0);
   }, [animationSpeed, progress, yoyo]);
+
   const backgroundPosition = useTransform(progress, (p) => `${p}% 50%`);
+  const handleMouseEnter = useCallback(() => {
+    if (pauseOnHover) setIsPaused(true);
+  }, [pauseOnHover]);
+  const handleMouseLeave = useCallback(() => {
+    if (pauseOnHover) setIsPaused(false);
+  }, [pauseOnHover]);
+
+  const gradientColors = [...colors, colors[0]].join(", ");
+  const gradientStyle = {
+    backgroundImage: `linear-gradient(to right, ${gradientColors})`,
+    backgroundSize: "300% 100%",
+    backgroundRepeat: "repeat",
+  };
 
   return (
-    <motion.span
-      onMouseEnter={() => pauseOnHover && setIsPaused(true)}
-      onMouseLeave={() => pauseOnHover && setIsPaused(false)}
-      style={{
-        backgroundImage: `linear-gradient(to right, ${[...colors, colors[0]].join(", ")})`,
-        backgroundSize: "300% 100%",
-        backgroundRepeat: "repeat",
-        WebkitBackgroundClip: "text",
-        WebkitTextFillColor: "transparent",
-        backgroundClip: "text",
-        display: "inline-block",
-        backgroundPosition,
-      }}
+    <motion.div
+      className={`animated-gradient-text ${showBorder ? "with-border" : ""} ${className}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      style={{ textAlign: "center", width: "100%" }} // ← override lokal
     >
-      {children}
-    </motion.span>
+      {showBorder && (
+        <motion.div
+          className="gradient-overlay"
+          style={{ ...gradientStyle, backgroundPosition }}
+        />
+      )}
+      <motion.div
+        className="text-content"
+        style={{
+          ...gradientStyle,
+          backgroundPosition,
+          textAlign: "center", // ← override lokal
+          width: "100%", // ← override lokal
+        }}
+      >
+        {children}
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -214,9 +269,9 @@ function getTimestamp() {
 const S = {
   wrapper: {
     position: "relative",
-    fontFamily: "'DM Sans', 'Segoe UI', sans-serif",
+    fontFamily: "Poppins, sans-serif",
     overflow: "hidden",
-    scrollMarginTop: "90px",
+    scrollMarginTop: "10px",
   },
   ferroLayer: { position: "absolute", inset: 0, zIndex: 0 },
   logoLoopWrap: {
@@ -227,12 +282,8 @@ const S = {
     zIndex: 1,
     overflow: "hidden",
     pointerEvents: "none",
-
-    // Hapus atau jadikan komentar baris opacity di bawah ini
-    // agar background hitam tidak ikut transparan/pudar
-    /* opacity: 0.18, */
     fadeOutColor: "#000000",
-    backgroundColor: "#15344c", // Tambahkan background hitam pekat di sini
+    backgroundColor: "#15344c",
     color: "#ffffff",
     padding: "16px 0",
     WebkitMaskImage:
@@ -246,7 +297,7 @@ const S = {
     zIndex: 1,
     pointerEvents: "none",
     backdropFilter: "blur(0px)",
-    WebkitBackdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(0px)",
     background: "transparent",
   },
   section: {
@@ -256,7 +307,7 @@ const S = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: "12px",
+    gap: "2px",
     paddingTop: "100px",
   },
   sectionLabel: {
@@ -348,7 +399,9 @@ const S = {
     fontSize: "13px",
     lineHeight: 1.5,
     maxWidth: "78%",
+    minWidth: "48px",
     wordBreak: "break-word",
+    whiteSpace: "pre-wrap",
     border: "1px solid rgba(96,165,250,0.20)",
   },
   bubbleTimeRight: {
@@ -610,22 +663,30 @@ const IcoUser = () => (
 );
 
 export const Contact = () => {
+  const { t } = useTranslation();
+
+  const [headingRef, headingVisible] = useReveal(0.2);
+  const [cardRef, cardVisible] = useReveal(0.1);
+
   const [nameInput, setNameInput] = useState("");
   const [userName, setUserName] = useState("");
   const [chatMsg, setChatMsg] = useState("");
   const [nameSet, setNameSet] = useState(false);
-  const [messages, setMessages] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const stored = JSON.parse(saved);
-        if (stored.length > 0) return stored;
-      }
-    } catch {
-      // Ignore localStorage errors
-    }
-    return [];
-  });
+  const [messages, setMessages] = useState([]);
+
+  // Load pesan realtime dari Firestore
+  useEffect(() => {
+    const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
+    const unsub = onSnapshot(q, (snapshot) => {
+      setMessages(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })),
+      );
+    });
+    return () => unsub();
+  }, []);
   const [fName, setFName] = useState("");
   const [fMsg, setFMsg] = useState("");
   const [success, setSuccess] = useState(false);
@@ -651,15 +712,29 @@ export const Contact = () => {
     setNameSet(true);
   };
 
-  const handleSendChat = () => {
+  const handleSendChat = async () => {
     const txt = chatMsg.trim();
     if (!txt) return;
     const { time, date } = getTimestamp();
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now(), type: "out", text: txt, sender: userName, time, date },
-    ]);
+
+    await addDoc(collection(db, "messages"), {
+      type: "out",
+      text: txt,
+      sender: userName,
+      time,
+      date,
+      createdAt: serverTimestamp(), // untuk sorting
+    });
+
     setChatMsg("");
+  };
+
+  const handleDelete = async (messageId) => {
+    try {
+      await deleteDoc(doc(db, "messages", messageId));
+    } catch (err) {
+      console.error("Gagal hapus pesan:", err);
+    }
   };
 
   const handleWA = () => {
@@ -690,274 +765,369 @@ export const Contact = () => {
 
   return (
     <div id="contact" style={S.wrapper}>
-      <div style={S.wrapper}>
-        {/* Ferrofluid background */}
-        <div style={S.ferroLayer}>
-          <Ferrofluid
-            colors={["#4F46E5", "#06B6D4", "#E0F2FE"]}
-            speed={0.5}
-            scale={1}
-            turbulence={1}
-            fluidity={0.1}
-            rimWidth={0.2}
-            sharpness={3}
-            shimmer={1}
-            glow={2}
-            flowDirection="down"
-            opacity={1}
-            mouseInteraction={true}
-            mouseStrength={1}
-            mouseRadius={0.3}
-          />
-        </div>
+      <div className="section-title-wrapper">
+        <div style={S.wrapper}>
+          {/* Ferrofluid background */}
+          <div style={S.ferroLayer}>
+            <Ferrofluid
+              colors={["#4F46E5", "#06B6D4", "#E0F2FE"]}
+              speed={0.5}
+              scale={1}
+              turbulence={1}
+              fluidity={0.1}
+              rimWidth={0.2}
+              sharpness={3}
+              shimmer={1}
+              glow={2}
+              flowDirection="down"
+              opacity={1}
+              mouseInteraction={true}
+              mouseStrength={1}
+              mouseRadius={0.3}
+            />
+          </div>
 
-        {/* ── LogoLoop strip di atas background ── */}
-        <div style={S.logoLoopWrap}>
-          <LogoLoop
-            logos={techLogos}
-            speed={55}
-            direction="left"
-            logoHeight={28}
-            gap={48}
-            hoverSpeed={0}
-            ariaLabel="Tech stack"
-          />
-        </div>
+          {/* LogoLoop strip */}
+          <div style={S.logoLoopWrap}>
+            <LogoLoop
+              logos={techLogos}
+              speed={55}
+              direction="left"
+              logoHeight={28}
+              gap={48}
+              hoverSpeed={0}
+              ariaLabel="Tech stack"
+            />
+          </div>
 
-        <div style={S.overlay} />
+          <div style={S.overlay} />
 
-        {/* Content */}
-        <div style={S.section}>
+          {/* Content */}
+          {/* Content */}
+          <div style={S.section}>
+            <div
+              ref={headingRef}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                marginBottom: "0.5rem",
+                opacity: headingVisible ? 1 : 0,
+                transform: headingVisible
+                  ? "translateY(0)"
+                  : "translateY(24px)",
+                transition: "opacity 0.7s ease, transform 0.7s ease",
+              }}
+            >
+              <h2
+                className="section-title"
+                style={{
+                  margin: 0,
+                  fontFamily: "Poppins, sans-serif",
+                  fontSize: "clamp(2.6rem, 6vw, 4.2rem)",
+                  fontWeight: 800,
+                  lineHeight: 1.08,
+                }}
+              >
+                <GradientText
+                  colors={[
+                    "#38bdf8",
+                    "#c084fc",
+                    "#38bdf8",
+                    "#c084fc",
+                    "#38bdf8",
+                  ]}
+                  animationSpeed={4}
+                >
+                  {t("contact.title")}
+                </GradientText>
+              </h2>
+              <p
+                style={{
+                  fontFamily: "Poppins, sans-serif",
+                  fontSize: "0.9rem",
+                  fontWeight: 300,
+                  textAlign: "center",
+                  color: "#ffffff",
+                  lineHeight: 1.75,
+                  maxWidth: "700px",
+                  margin: "0 auto",
+                  marginBottom: "-2px",
+                }}
+              >
+                {t("contact.subtitle_line1")}
+                <br />
+                {t("contact.subtitle_line2")}
+              </p>
+            </div>
+          </div>
+
           <div
             style={{
+              width: "100%",
               display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              marginBottom: "2rem",
+              justifyContent: "center",
+              padding: "0 20px 60px",
             }}
           >
-            <h2
-              className="section-title"
+            <div
+              ref={cardRef}
               style={{
-                margin: 0,
-                fontSize: "clamp(2.6rem, 6vw, 4.2rem)",
-                fontWeight: 800,
-                lineHeight: 1.08,
+                ...S.card,
+                marginTop: "-22px",
+                opacity: cardVisible ? 1 : 0,
+                transform: cardVisible
+                  ? "translateY(0) scale(1)"
+                  : "translateY(32px) scale(0.98)",
+                transition:
+                  "opacity 0.6s ease 0.2s, transform 0.6s cubic-bezier(0.34,1.2,0.64,1) 0.2s",
               }}
             >
-              <GradientText
-                colors={["#38bdf8", "#c084fc", "#38bdf8", "#c084fc", "#38bdf8"]}
-                animationSpeed={4}
-              >
-                Get In Touch
-              </GradientText>
-            </h2>
-            <p
-              className="exp-subtitle"
-              style={{
-                color: "#ffffff",
-                textAlign: "center",
-                margin: "12px auto 0",
-                whiteSpace: "nowrap",
-                maxWidth: "100%",
-              }}
-            >
-              Have a question or want to work together?
-              <br />
-              Choose the most convenient way for you.
-            </p>
-          </div>
+              {/* LEFT */}
+              <div style={S.leftPanel}>
+                <div style={S.msgsArea} ref={msgsRef}>
+                  <p style={S.leaveMsg}>{t("contact.leave_message")}</p>
+                  <p style={S.timeLabel}>{getToday()}</p>
+                  {messages.length === 0 && (
+                    <p
+                      style={{
+                        fontSize: "12px",
+                        color: "#334155",
+                        textAlign: "center",
+                        marginTop: "16px",
+                      }}
+                    ></p>
+                  )}
+                  {messages.map((m) => (
+                    <div key={m.id} style={S.msgWrapOut}>
+                      {/* Nama · Tanggal + icon trash di samping */}
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          justifyContent: "flex-end",
+                        }}
+                      >
+                        <span style={S.msgMeta}>
+                          {m.sender} · {m.date}
+                        </span>
+                        {m.sender === userName && (
+                          <button
+                            onClick={() => handleDelete(m.id)}
+                            title="Hapus pesan"
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              padding: "0",
+                              color: "#475569",
+                              display: "flex",
+                              alignItems: "center",
+                              flexShrink: 0,
+                              transition: "color 0.15s",
+                            }}
+                            onMouseEnter={(e) =>
+                              (e.currentTarget.style.color = "#ef4444")
+                            }
+                            onMouseLeave={(e) =>
+                              (e.currentTarget.style.color = "#475569")
+                            }
+                          >
+                            <svg
+                              width="11"
+                              height="11"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6l-1 14H6L5 6" />
+                              <path d="M10 11v6M14 11v6" />
+                              <path d="M9 6V4h6v2" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                      <div style={S.bubbleOut}>{m.text}</div>
+                      <p style={S.bubbleTimeRight}>{m.time}</p>
+                    </div>
+                  ))}
+                </div>
 
-          <div style={S.card}>
-            {/* LEFT */}
-            <div style={S.leftPanel}>
-              <div style={S.msgsArea} ref={msgsRef}>
-                <p style={S.leaveMsg}>Leave a Message</p>
-                <p style={S.timeLabel}>{getToday()}</p>
-                {messages.length === 0 && (
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      color: "#334155",
-                      textAlign: "center",
-                      marginTop: "16px",
-                    }}
-                  ></p>
+                {!nameSet && (
+                  <div style={S.namePrompt}>
+                    <IcoUser />
+                    <input
+                      style={S.nameInput}
+                      type="text"
+                      placeholder={t("contact.name_placeholder")}
+                      value={nameInput}
+                      maxLength={30}
+                      onChange={(e) => setNameInput(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleSetName()}
+                    />
+                    <button style={S.nameOkBtn} onClick={handleSetName}>
+                      OK
+                    </button>
+                  </div>
                 )}
-                {messages.map((m) => (
-                  <div key={m.id} style={S.msgWrapOut}>
-                    <span style={S.msgMeta}>
-                      {m.sender} · {m.date}
-                    </span>
-                    <div style={S.bubbleOut}>{m.text}</div>
-                    <p style={S.bubbleTimeRight}>{m.time}</p>
+
+                {nameSet && (
+                  <div style={S.chatInputRow}>
+                    <input
+                      style={S.chatInput}
+                      type="text"
+                      placeholder={t("contact.message_placeholder")}
+                      value={chatMsg}
+                      onChange={(e) => setChatMsg(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleSendChat()}
+                    />
+                    <button
+                      style={S.sendBtn(!chatMsg.trim())}
+                      onClick={handleSendChat}
+                      disabled={!chatMsg.trim()}
+                      aria-label="Send"
+                    >
+                      <IcoSend />
+                    </button>
                   </div>
-                ))}
+                )}
               </div>
 
-              {!nameSet && (
-                <div style={S.namePrompt}>
-                  <IcoUser />
-                  <input
-                    style={S.nameInput}
-                    type="text"
-                    placeholder="Enter your name..."
-                    value={nameInput}
-                    maxLength={30}
-                    onChange={(e) => setNameInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSetName()}
-                  />
-                  <button style={S.nameOkBtn} onClick={handleSetName}>
-                    OK
-                  </button>
+              {/* RIGHT */}
+              <div style={S.rightPanel}>
+                <div>
+                  <h3 style={S.rightTitle}>
+                    {t("contact.send_message_title")}
+                  </h3>
+                  <p style={S.rightSub}>
+                    {t("contact.send_message_sub_line1")}
+                    <br />
+                    {t("contact.send_message_sub_line2")}
+                  </p>
                 </div>
-              )}
-
-              {nameSet && (
-                <div style={S.chatInputRow}>
-                  <input
-                    style={S.chatInput}
-                    type="text"
-                    placeholder="Write your message..."
-                    value={chatMsg}
-                    onChange={(e) => setChatMsg(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSendChat()}
-                  />
-                  <button
-                    style={S.sendBtn(!chatMsg.trim())}
-                    onClick={handleSendChat}
-                    disabled={!chatMsg.trim()}
-                    aria-label="Send"
+                <div style={S.divider} />
+                <div style={S.quickRow}>
+                  <div
+                    style={S.quickCard("wa")}
+                    onClick={() =>
+                      window.open(`https://wa.me/${WA_NUMBER}`, "_blank")
+                    }
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.boxShadow =
+                        "0 8px 24px rgba(0,0,0,0.4)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "";
+                      e.currentTarget.style.boxShadow = "";
+                    }}
                   >
-                    <IcoSend />
+                    <div style={S.quickIcon("wa")}>
+                      <IcoWA />
+                    </div>
+                    <span style={S.quickLabel}>{t("contact.wa_label")}</span>
+                    <span style={S.quickName("wa")}>WhatsApp</span>
+                  </div>
+                  <div
+                    style={S.quickCard("em")}
+                    onClick={() => window.open(`mailto:${EMAIL_TO}`)}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.boxShadow =
+                        "0 8px 24px rgba(0,0,0,0.4)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "";
+                      e.currentTarget.style.boxShadow = "";
+                    }}
+                  >
+                    <div style={S.quickIcon("em")}>
+                      <IcoMail />
+                    </div>
+                    <span style={S.quickLabel}>{t("contact.email_label")}</span>
+                    <span style={S.quickName("em")}>Email</span>
+                  </div>
+                </div>
+                <div style={S.divider} />
+                <div>
+                  <label style={S.formLabel}>{t("contact.form_name")}</label>
+                  <input
+                    style={S.formInput}
+                    type="text"
+                    placeholder={t("contact.form_name_placeholder")}
+                    value={fName}
+                    onChange={(e) => setFName(e.target.value)}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = "#2563eb";
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = "rgba(255,255,255,0.08)";
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={S.formLabel}>{t("contact.form_message")}</label>
+                  <textarea
+                    style={S.formTextarea}
+                    rows={3}
+                    placeholder={t("contact.form_message_placeholder")}
+                    value={fMsg}
+                    onChange={(e) => setFMsg(e.target.value)}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = "#2563eb";
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = "rgba(255,255,255,0.08)";
+                    }}
+                  />
+                </div>
+                {success && (
+                  <div style={S.successBadge}>
+                    <IcoCheck /> {t("contact.success_message")}
+                  </div>
+                )}
+                <div style={S.actionRow}>
+                  <button
+                    style={S.actionBtn("wa", !formOk)}
+                    onClick={handleWA}
+                    disabled={!formOk}
+                    onMouseEnter={(e) => {
+                      if (formOk)
+                        e.currentTarget.style.transform = "scale(1.02)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "";
+                    }}
+                  >
+                    <IcoWA /> WhatsApp
+                  </button>
+                  <button
+                    style={S.actionBtn("em", !formOk)}
+                    onClick={handleEmail}
+                    disabled={!formOk}
+                    onMouseEnter={(e) => {
+                      if (formOk)
+                        e.currentTarget.style.transform = "scale(1.02)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "";
+                    }}
+                  >
+                    <IcoMail /> Email
                   </button>
                 </div>
-              )}
-            </div>
-
-            {/* RIGHT */}
-            <div style={S.rightPanel}>
-              <div>
-                <h3 style={S.rightTitle}>Send a Message</h3>
-                <p style={S.rightSub}>
-                  Have a question or project in mind?
-                  <br />
-                  Feel free to contact me via WhatsApp or email.
-                </p>
-              </div>
-              <div style={S.divider} />
-              <div style={S.quickRow}>
-                <div
-                  style={S.quickCard("wa")}
-                  onClick={() =>
-                    window.open(`https://wa.me/${WA_NUMBER}`, "_blank")
-                  }
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow =
-                      "0 8px 24px rgba(0,0,0,0.4)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "";
-                    e.currentTarget.style.boxShadow = "";
-                  }}
-                >
-                  <div style={S.quickIcon("wa")}>
-                    <IcoWA />
-                  </div>
-                  <span style={S.quickLabel}>Chat directly</span>
-                  <span style={S.quickName("wa")}>WhatsApp</span>
-                </div>
-                <div
-                  style={S.quickCard("em")}
-                  onClick={() => window.open(`mailto:${EMAIL_TO}`)}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow =
-                      "0 8px 24px rgba(0,0,0,0.4)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "";
-                    e.currentTarget.style.boxShadow = "";
-                  }}
-                >
-                  <div style={S.quickIcon("em")}>
-                    <IcoMail />
-                  </div>
-                  <span style={S.quickLabel}>Send a letter</span>
-                  <span style={S.quickName("em")}>Email</span>
-                </div>
-              </div>
-              <div style={S.divider} />
-              <div>
-                <label style={S.formLabel}>Name</label>
-                <input
-                  style={S.formInput}
-                  type="text"
-                  placeholder="Your name"
-                  value={fName}
-                  onChange={(e) => setFName(e.target.value)}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = "#2563eb";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = "rgba(255,255,255,0.08)";
-                  }}
-                />
-              </div>
-              <div>
-                <label style={S.formLabel}>Message</label>
-                <textarea
-                  style={S.formTextarea}
-                  rows={3}
-                  placeholder="Write your message here..."
-                  value={fMsg}
-                  onChange={(e) => setFMsg(e.target.value)}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = "#2563eb";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = "rgba(255,255,255,0.08)";
-                  }}
-                />
-              </div>
-              {success && (
-                <div style={S.successBadge}>
-                  <IcoCheck /> Message sent successfully!
-                </div>
-              )}
-              <div style={S.actionRow}>
-                <button
-                  style={S.actionBtn("wa", !formOk)}
-                  onClick={handleWA}
-                  disabled={!formOk}
-                  onMouseEnter={(e) => {
-                    if (formOk) e.currentTarget.style.transform = "scale(1.02)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "";
-                  }}
-                >
-                  <IcoWA /> WhatsApp
-                </button>
-                <button
-                  style={S.actionBtn("em", !formOk)}
-                  onClick={handleEmail}
-                  disabled={!formOk}
-                  onMouseEnter={(e) => {
-                    if (formOk) e.currentTarget.style.transform = "scale(1.02)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "";
-                  }}
-                >
-                  <IcoMail /> Email
-                </button>
               </div>
             </div>
+          </div>
+          <div style={{ marginTop: "auto" }}>
+            <Footer />
           </div>
         </div>
-        <Footer />
       </div>
     </div>
   );

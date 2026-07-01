@@ -1,6 +1,7 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import "./Footer.css";
-import LogoM from "../../assets/LogoM.png";
+import LogoM from "../../assets/LogoM.webp";
 import { FaLinkedinIn, FaInstagram, FaGithub } from "react-icons/fa";
 
 const FOOTER_ITEMS = [
@@ -23,6 +24,8 @@ const SOCIAL_ICONS = [
 ];
 
 const Footer = () => {
+  const { t } = useTranslation();
+
   const handleScroll = (e, targetId) => {
     e.preventDefault();
     const section = document.getElementById(targetId);
@@ -42,9 +45,7 @@ const Footer = () => {
           {FOOTER_ITEMS.map((item) => (
             <li key={item}>
               <a href={`#${item}`} onClick={(e) => handleScroll(e, item)}>
-                {item === "cv"
-                  ? "CV"
-                  : item.charAt(0).toUpperCase() + item.slice(1)}
+                {t(`nav.${item}`)}
               </a>
             </li>
           ))}
@@ -55,13 +56,7 @@ const Footer = () => {
       <div className="footer-divider" />
 
       {/* MIDDLE: Description */}
-      <p className="footer-desc">
-        Building secure, scalable, and high-performance digital solutions.
-        Crafted with passion, driven by curiosity, and powered by clean,
-        reliable code. I focus on creating meaningful digital experiences that
-        not only solve real-world problems but also support long-term growth,
-        innovation, and business success.
-      </p>
+      <p className="footer-desc">{t("footer.description")}</p>
 
       {/* SOCIAL ICONS */}
       <div className="footer-socials">

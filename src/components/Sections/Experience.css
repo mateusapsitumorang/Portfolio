@@ -1,0 +1,634 @@
+/* Experience.css */
+
+/* ─── ShapeGrid CSS-only version ─── */
+.shapegrid-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.shapegrid-canvas-css {
+    width: 200%;
+    height: 200%;
+    background-image:
+        linear-gradient(rgba(56, 189, 248, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.12) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: 0 0;
+    animation: gridScroll 8s linear infinite;
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    will-change: transform;
+}
+
+@keyframes gridScroll {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(40px, 40px);
+    }
+}
+
+.shapegrid-hover-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+.card-spotlight {
+    position: relative;
+    border-radius: 20px;
+    background-color: rgba(9, 15, 23, 0.9);
+    overflow: hidden;
+    --mouse-x: 50%;
+    --mouse-y: 50%;
+    --spotlight-color: rgba(255, 255, 255, 0.05);
+    border: none;
+}
+
+.card-spotlight::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--spotlight-color), transparent 80%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.card-spotlight:hover::before,
+.card-spotlight:focus-within::before {
+    opacity: 0.6;
+}
+
+.animated-gradient-text {
+    position: relative;
+    margin: 0;
+    display: inline-flex;
+    max-width: fit-content;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1.25rem;
+    font-weight: 800;
+    transition: box-shadow 0.5s ease-out;
+    overflow: hidden;
+    cursor: default;
+}
+
+.animated-gradient-text.with-border {
+    padding: 0.35rem 0.75rem;
+}
+
+.gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.gradient-overlay::before {
+    content: '';
+    position: absolute;
+    border-radius: inherit;
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #0a0b1a;
+    z-index: -1;
+}
+
+.text-content {
+    display: inline-block;
+    position: relative;
+    z-index: 2;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    font-size: clamp(2.6rem, 6vw, 4.2rem);
+    white-space: nowrap;
+    font-weight: 800;
+    line-height: 1.08;
+}
+
+/* Keyframe gradient dipindah kesini — statis, tidak perlu di-inject via JS */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@media (max-width: 640px) {
+    .animated-gradient-text {
+        max-width: 100% !important;
+        flex-wrap: wrap;
+        white-space: normal !important;
+    }
+
+    .text-content {
+        white-space: normal !important;
+        font-size: clamp(2rem, 8vw, 2.8rem);
+        text-align: left;
+        line-height: 1.15;
+    }
+}
+
+.exp-section {
+    position: relative;
+    min-height: auto;
+    background: transparent;
+}
+
+.exp-bg {
+    position: absolute;
+    top: 0;
+    left: calc(50% - 50vw);
+    width: 100vw;
+    height: 100%;
+    z-index: -2;
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.exp-bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(130px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.exp-container {
+    position: relative;
+    z-index: 10;
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+.exp-bg-orb-1 {
+    width: 480px;
+    height: 480px;
+    top: -80px;
+    right: -140px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.07) 0%, transparent 70%);
+}
+
+.exp-bg-orb-2 {
+    width: 380px;
+    height: 380px;
+    bottom: 60px;
+    left: -80px;
+    background: radial-gradient(circle, rgba(192, 132, 252, 0.07) 0%, transparent 70%);
+}
+
+.exp-heading {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+    margin-top: 100px;
+}
+
+@media (max-width: 1023px) {
+    .exp-heading {
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 767px) {
+    .exp-heading {
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 479px) {
+    .exp-heading {
+        margin-top: 2px;
+    }
+}
+
+.exp-heading.exp-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.exp-label-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+
+.exp-label-line {
+    display: block;
+    width: 32px;
+    height: 2px;
+    background: #38bdf8;
+    border-radius: 1px;
+    flex-shrink: 0;
+}
+
+.exp-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #38bdf8;
+}
+
+.exp-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(2.6rem, 6vw, 4.2rem);
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.08;
+}
+
+.exp-subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: #ffffff;
+    line-height: 1.75;
+    max-width: 700px;
+}
+
+.exp-timeline {
+    position: relative;
+}
+
+.exp-timeline-line {
+    position: absolute;
+    left: 7px;
+    top: 8px;
+    bottom: 12px;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 1px;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.exp-timeline-line-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: calc(var(--line-progress, 0) * 100%);
+    background: linear-gradient(to bottom, #38bdf8, #c084fc);
+    border-radius: 1px;
+    transition: height 0.02s linear;
+}
+
+.exp-unified-card {
+    margin-left: 36px;
+    position: relative;
+    z-index: 1;
+}
+
+.exp-row-reveal {
+    opacity: 0;
+    transform: translateX(-18px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.exp-row-reveal.exp-visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.exp-row {
+    position: relative;
+    padding: 2rem 2.25rem 2rem 2.25rem;
+    transition: background 0.4s ease;
+}
+
+.exp-row-divider {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+@media (max-width: 1023px) {
+    .exp-section {
+        padding: 72px 2rem 6rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .exp-section {
+        padding: 66px 1.5rem 4rem;
+    }
+}
+
+@media (max-width: 479px) {
+    .exp-section {
+        padding: 60px 1.5rem 4rem;
+    }
+}
+
+@media (max-width: 319px) {
+    .exp-section {
+        padding: 54px 1.5rem 4rem;
+    }
+}
+
+.exp-dot-wrap {
+    position: absolute;
+    left: -43px;
+    top: 2.35rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    z-index: 10;
+}
+
+.exp-dot {
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--dot-color, #38bdf8);
+    box-shadow: 0 0 8px var(--dot-color, #38bdf8), 0 0 16px var(--dot-color, #38bdf8);
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+}
+
+.exp-dot-ping {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1.5px solid var(--dot-color, #38bdf8);
+    opacity: 0;
+    animation: dotPing 2.2s ease-out infinite;
+}
+
+@keyframes dotPing {
+    0% {
+        transform: scale(1);
+        opacity: 0.75;
+    }
+
+    100% {
+        transform: scale(2.6);
+        opacity: 0;
+    }
+}
+
+.exp-row-content {
+    width: 100%;
+}
+
+.exp-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.exp-card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.exp-company-badge {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--badge-color);
+    flex-shrink: 0;
+}
+
+.exp-role {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #eae8f2;
+    line-height: 1.3;
+    margin-bottom: 4px;
+}
+
+.exp-company-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    margin-top: 2px;
+}
+
+.exp-company {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.exp-sep {
+    color: #3d4259;
+    font-size: 11px;
+}
+
+.exp-location {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    font-weight: 300;
+    color: #ffffffb4;
+}
+
+.exp-card-header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 7px;
+    flex-shrink: 0;
+}
+
+.exp-period {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--period-color, #38bdf8);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.exp-type-badge {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.exp-type-current {
+    background: color-mix(in srgb, var(--badge-color) 12%, transparent);
+    border-color: color-mix(in srgb, var(--badge-color) 35%, transparent);
+    color: var(--badge-color);
+}
+
+.exp-live-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--dot-color, #38bdf8);
+    animation: livePulse 2s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.4;
+        transform: scale(0.7);
+    }
+}
+
+.exp-accent-line {
+    height: 1px;
+    background: linear-gradient(to right, var(--line-color, #38bdf8) 0%, rgba(255, 255, 255, 0.06) 55%, transparent 100%);
+    margin-bottom: 1.1rem;
+    opacity: 0.45;
+}
+
+.exp-desc {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.87rem;
+    font-weight: 300;
+    color: #ffffff;
+    line-height: 1.8;
+    margin-bottom: 1.1rem;
+}
+
+.exp-achievements {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+    padding: 0;
+}
+
+.exp-ach-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.83rem;
+    font-weight: 300;
+    color: #ffffff;
+    line-height: 1.65;
+}
+
+.exp-ach-bullet {
+    color: var(--bullet-color, #38bdf8);
+    font-size: 1rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    line-height: 1.4;
+}
+
+.exp-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-top: 0.2rem;
+}
+
+.exp-chip {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    font-weight: 500;
+    padding: 3px 11px;
+    border-radius: 100px;
+    background: color-mix(in srgb, var(--chip-color) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--chip-color) 25%, transparent);
+    color: var(--chip-color);
+    letter-spacing: 0.2px;
+    transition: background 0.2s ease;
+    cursor: default;
+}
+
+.exp-chip:hover {
+    background: color-mix(in srgb, var(--chip-color) 20%, transparent);
+}
+
+@media (max-width: 640px) {
+    .exp-row {
+        padding: 1.5rem 1.4rem;
+    }
+
+    .exp-card-header {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .exp-card-header-right {
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .exp-unified-card {
+        margin-left: 28px;
+    }
+
+    .exp-dot-wrap {
+        left: -35px;
+    }
+}

@@ -13,6 +13,7 @@
     box-shadow:
         0 8px 32px rgba(0, 0, 0, 0.45),
         inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    /* tidak perlu will-change, wrap ini statis, tidak animasi */
 }
 
 .card {
@@ -22,9 +23,9 @@
     border-radius: 20px;
     overflow: hidden;
     cursor: pointer;
+    isolation: isolate;
 }
 
-/* Base semua gambar */
 .card__img {
     position: absolute;
     inset: 0;
@@ -32,191 +33,147 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    /* will-change dihapus dari default state */
 }
 
-/* Default: gambar 1 tampil, gambar 2 sembunyi */
 .card__img--default {
     z-index: 1;
     opacity: 1;
     transform: scale(1);
-    filter: blur(0px);
 }
 
 .card__img--hover {
     z-index: 2;
     opacity: 0;
     transform: scale(1.2);
-    filter: blur(0px);
 }
 
-/* ── KEYFRAMES MOTION BLUR ── */
+/* will-change HANYA dipasang selama animasi berjalan */
+.motion-in,
+.motion-out {
+    will-change: transform, opacity;
+}
 
-/* Masuk: zoom in dari besar → normal, blur memuncak di tengah */
 @keyframes motionBlurIn {
     0% {
         transform: scale(1.25);
         opacity: 0;
-        filter: blur(0px);
     }
 
-    35% {
-        transform: scale(1.10);
-        opacity: 0.5;
-        filter: blur(14px);
-    }
-
-    70% {
-        transform: scale(1.03);
-        opacity: 0.9;
-        filter: blur(4px);
+    40% {
+        opacity: 0.6;
     }
 
     100% {
         transform: scale(1);
         opacity: 1;
-        filter: blur(0px);
     }
 }
 
-/* Keluar: zoom out dari normal → besar, blur memuncak di tengah */
 @keyframes motionBlurOut {
     0% {
         transform: scale(1);
         opacity: 1;
-        filter: blur(0px);
     }
 
-    35% {
-        transform: scale(1.10);
-        opacity: 0.5;
-        filter: blur(14px);
-    }
-
-    70% {
-        transform: scale(1.18);
-        opacity: 0.1;
-        filter: blur(4px);
+    40% {
+        opacity: 0.4;
     }
 
     100% {
         transform: scale(1.25);
         opacity: 0;
-        filter: blur(0px);
     }
 }
 
-/* ── KELAS ANIMASI ── */
 .motion-in {
-    animation: motionBlurIn 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+    animation: motionBlurIn 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
 }
 
 .motion-out {
-    animation: motionBlurOut 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+    animation: motionBlurOut 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
 }
 
-/* ── RESPONSIVE ── */
-/* Large Desktop: > 1440px */
+/* ── RESPONSIVE — digabung, tidak ada duplikat range ── */
 @media (min-width: 1441px) {
     .card {
         width: 260px;
         height: 380px;
     }
-    
+
     .frost-wrap {
         padding: 8px;
         border-radius: 30px;
     }
 }
 
-/* Desktop: 1025px - 1440px */
-@media (min-width: 1025px) and (max-width: 1440px) {
-    .card {
-        width: 220px;
-        height: 320px;
-    }
-}
-
-/* Tablet Landscape: 1024px */
 @media (max-width: 1024px) and (min-width: 769px) {
     .card {
         width: 200px;
         height: 290px;
     }
-    
+
     .frost-wrap {
         padding: 5px;
         border-radius: 24px;
     }
 }
 
-/* Tablet Portrait / Mobile Landscape: 768px */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (min-width: 481px) {
     .card {
-        width: 180px;
-        height: 260px;
+        width: 200px;
+        height: 290px;
     }
-    
+
     .frost-wrap {
         padding: 4px;
         border-radius: 22px;
     }
 }
 
-/* Mobile: 480px - 768px */
-@media (max-width: 768px) and (min-width: 481px) {
-    .card {
-        width: 200px;
-        height: 290px;
-    }
-}
-
-/* Small Mobile: ≤ 480px */
-@media (max-width: 480px) {
+@media (max-width: 480px) and (min-width: 361px) {
     .card {
         width: 160px;
         height: 230px;
     }
-    
+
     .frost-wrap {
         padding: 3px;
         border-radius: 20px;
     }
 }
 
-/* Extra Small: ≤ 360px */
 @media (max-width: 360px) {
     .card {
         width: 140px;
         height: 200px;
     }
-    
+
     .frost-wrap {
         padding: 2px;
         border-radius: 18px;
     }
 }
 
-/* Touch device optimizations */
 @media (hover: none) and (pointer: coarse) {
     .card {
         cursor: default;
     }
-    
+
     .card__img--hover {
         opacity: 0.3;
         transform: scale(1.1);
     }
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
+
     .motion-in,
     .motion-out {
         animation-duration: 0.01ms !important;
     }
 }
 
-/* High contrast mode */
 @media (prefers-contrast: high) {
     .frost-wrap {
         border-width: 2px;
@@ -224,7 +181,6 @@
     }
 }
 
-/* Print styles */
 @media print {
     .card__img--hover {
         display: none;

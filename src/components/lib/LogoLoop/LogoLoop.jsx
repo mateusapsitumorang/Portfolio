@@ -21,9 +21,7 @@ const useResizeObserver = (callback, elements, dependencies) => {
       return observer;
     });
     callback();
-    return () => {
-      observers.forEach((observer) => observer?.disconnect());
-    };
+    return () => observers.forEach((observer) => observer?.disconnect());
   }, [callback, elements, dependencies]);
 };
 
@@ -40,12 +38,11 @@ const useImageLoader = (seqRef, onLoad, dependencies) => {
       if (remainingImages === 0) onLoad();
     };
     images.forEach((img) => {
-      const htmlImg = img;
-      if (htmlImg.complete) {
+      if (img.complete) {
         handleImageLoad();
       } else {
-        htmlImg.addEventListener("load", handleImageLoad, { once: true });
-        htmlImg.addEventListener("error", handleImageLoad, { once: true });
+        img.addEventListener("load", handleImageLoad, { once: true });
+        img.addEventListener("error", handleImageLoad, { once: true });
       }
     });
     return () => {
@@ -57,8 +54,10 @@ const useImageLoader = (seqRef, onLoad, dependencies) => {
   }, [onLoad, seqRef, dependencies]);
 };
 
+// FIX: tambah containerRef agar bisa pause saat off-screen
 const useAnimationLoop = (
   trackRef,
+  containerRef,
   targetVelocity,
   seqWidth,
   seqHeight,
@@ -70,25 +69,32 @@ const useAnimationLoop = (
   const lastTimestampRef = useRef(null);
   const offsetRef = useRef(0);
   const velocityRef = useRef(0);
+  const isVisibleRef = useRef(false);
 
   useEffect(() => {
     const track = trackRef.current;
-    if (!track) return;
+    const container = containerRef.current;
+    if (!track || !container) return;
 
     const seqSize = isVertical ? seqHeight : seqWidth;
 
     if (seqSize > 0) {
       offsetRef.current = ((offsetRef.current % seqSize) + seqSize) % seqSize;
-      const transformValue = isVertical
+      track.style.transform = isVertical
         ? `translate3d(0, ${-offsetRef.current}px, 0)`
         : `translate3d(${-offsetRef.current}px, 0, 0)`;
-      track.style.transform = transformValue;
     }
 
     const animate = (timestamp) => {
-      if (lastTimestampRef.current === null) {
-        lastTimestampRef.current = timestamp;
+      // FIX: stop loop jika tidak visible
+      if (!isVisibleRef.current) {
+        rafRef.current = null;
+        lastTimestampRef.current = null;
+        return;
       }
+
+      if (lastTimestampRef.current === null)
+        lastTimestampRef.current = timestamp;
 
       const deltaTime =
         Math.max(0, timestamp - lastTimestampRef.current) / 1000;
@@ -96,7 +102,6 @@ const useAnimationLoop = (
 
       const target =
         isHovered && hoverSpeed !== undefined ? hoverSpeed : targetVelocity;
-
       const easingFactor =
         1 - Math.exp(-deltaTime / ANIMATION_CONFIG.SMOOTH_TAU);
       velocityRef.current += (target - velocityRef.current) * easingFactor;
@@ -105,19 +110,34 @@ const useAnimationLoop = (
         let nextOffset = offsetRef.current + velocityRef.current * deltaTime;
         nextOffset = ((nextOffset % seqSize) + seqSize) % seqSize;
         offsetRef.current = nextOffset;
-
-        const transformValue = isVertical
+        track.style.transform = isVertical
           ? `translate3d(0, ${-offsetRef.current}px, 0)`
           : `translate3d(${-offsetRef.current}px, 0, 0)`;
-        track.style.transform = transformValue;
       }
 
       rafRef.current = requestAnimationFrame(animate);
     };
 
-    rafRef.current = requestAnimationFrame(animate);
+    // FIX: IntersectionObserver — RAF hanya jalan saat terlihat di viewport
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+        if (entry.isIntersecting && rafRef.current === null) {
+          lastTimestampRef.current = null;
+          rafRef.current = requestAnimationFrame(animate);
+        }
+      },
+      { threshold: 0 },
+    );
+    visibilityObserver.observe(container);
+
+    // Start hanya jika sudah visible
+    if (isVisibleRef.current) {
+      rafRef.current = requestAnimationFrame(animate);
+    }
 
     return () => {
+      visibilityObserver.disconnect();
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
@@ -132,6 +152,7 @@ const useAnimationLoop = (
     hoverSpeed,
     isVertical,
     trackRef,
+    containerRef,
   ]);
 };
 
@@ -173,12 +194,13 @@ export const LogoLoop = memo(
 
     const targetVelocity = useMemo(() => {
       const magnitude = Math.abs(speed);
-      let directionMultiplier;
-      if (isVertical) {
-        directionMultiplier = direction === "up" ? 1 : -1;
-      } else {
-        directionMultiplier = direction === "left" ? 1 : -1;
-      }
+      const directionMultiplier = isVertical
+        ? direction === "up"
+          ? 1
+          : -1
+        : direction === "left"
+          ? 1
+          : -1;
       const speedMultiplier = speed < 0 ? -1 : 1;
       return magnitude * directionMultiplier * speedMultiplier;
     }, [speed, direction, isVertical]);
@@ -221,7 +243,6 @@ export const LogoLoop = memo(
       [containerRef, seqRef],
       [logos, gap, logoHeight, isVertical],
     );
-
     useImageLoader(seqRef, updateDimensions, [
       logos,
       gap,
@@ -229,8 +250,10 @@ export const LogoLoop = memo(
       isVertical,
     ]);
 
+    // FIX: pass containerRef ke useAnimationLoop
     useAnimationLoop(
       trackRef,
+      containerRef,
       targetVelocity,
       seqWidth,
       seqHeight,
@@ -265,6 +288,7 @@ export const LogoLoop = memo(
     const handleMouseEnter = useCallback(() => {
       if (effectiveHoverSpeed !== undefined) setIsHovered(true);
     }, [effectiveHoverSpeed]);
+
     const handleMouseLeave = useCallback(() => {
       if (effectiveHoverSpeed !== undefined) setIsHovered(false);
     }, [effectiveHoverSpeed]);
@@ -316,6 +340,7 @@ export const LogoLoop = memo(
         ) : (
           content
         );
+
         return (
           <li className="logoloop__item" key={key} role="listitem">
             {itemContent}
@@ -378,5 +403,4 @@ export const LogoLoop = memo(
 );
 
 LogoLoop.displayName = "LogoLoop";
-
 export default LogoLoop;

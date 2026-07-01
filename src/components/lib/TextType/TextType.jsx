@@ -6,7 +6,6 @@ import {
   useMemo,
   useCallback,
 } from "react";
-import { gsap } from "gsap";
 import "./TextType.css";
 
 const TextType = ({
@@ -35,7 +34,6 @@ const TextType = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(!startOnVisible);
-  const cursorRef = useRef(null);
   const containerRef = useRef(null);
 
   const textArray = useMemo(
@@ -68,18 +66,7 @@ const TextType = ({
     return () => observer.disconnect();
   }, [startOnVisible]);
 
-  useEffect(() => {
-    if (showCursor && cursorRef.current) {
-      gsap.set(cursorRef.current, { opacity: 1 });
-      gsap.to(cursorRef.current, {
-        opacity: 0,
-        duration: cursorBlinkDuration,
-        repeat: -1,
-        yoyo: true,
-        ease: "power2.inOut",
-      });
-    }
-  }, [showCursor, cursorBlinkDuration]);
+  // GSAP dihapus — cursor blink sekarang pakai CSS animation di TextType.css
 
   useEffect(() => {
     if (!isVisible) return;
@@ -160,8 +147,9 @@ const TextType = ({
     </span>,
     showCursor && (
       <span
-        ref={cursorRef}
         className={`text-type__cursor ${cursorClassName} ${shouldHideCursor ? "text-type__cursor--hidden" : ""}`}
+        // durasi blink dikontrol CSS variable
+        style={{ "--cursor-blink-duration": `${cursorBlinkDuration}s` }}
       >
         {cursorCharacter}
       </span>

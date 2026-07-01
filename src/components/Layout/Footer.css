@@ -2,8 +2,10 @@
 
 .floating-footer {
     position: relative;
-    margin: 100px auto 0 auto;
-    width: 70%;
+    margin: 0 auto 0 auto;
+    /* 1. Tambahkan translateZ(0) untuk Hardware Acceleration */
+    transform: translateZ(0); 
+    width: 80%;
     max-width: 1100px;
     display: flex;
     flex-direction: column;
@@ -12,9 +14,15 @@
     padding: 0 30px 24px;
     box-sizing: border-box;
 
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(15px);
+    /* 2. Naikkan sedikit transparansi menjadi 0.05 */
+    background: rgba(255, 255, 255, 0.05); 
+    
+    /* 3. URUTAN WAJIB: -webkit- di atas versi standar */
     -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    
+    /* 4. Beri tahu browser bahwa elemen ini akan merender blur */
+    will-change: backdrop-filter;
 
     border-radius: 30px 30px 0 0;
     z-index: 1000;
@@ -158,12 +166,12 @@
     .floating-footer {
         max-width: 1200px;
         padding: 0 40px 30px;
-        margin: 120px auto 0;
+        margin: 20px auto 0;
         border-radius: 40px 40px 0 0;
     }
     
     .footer-top {
-        gap: 16px;
+        gap: 10px;
         padding: 30px 0 20px;
     }
     

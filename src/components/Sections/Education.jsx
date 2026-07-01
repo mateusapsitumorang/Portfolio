@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
   motion,
   useMotionValue,
@@ -7,51 +8,317 @@ import {
 } from "motion/react";
 import ScrollStack, { ScrollStackItem } from "../lib/ScrollStack/ScrollStack";
 
-import logo1 from "../../assets/educationIcon/1.png";
-import logo2 from "../../assets/educationIcon/2.png";
-import logo3 from "../../assets/educationIcon/3.png";
-import logo4 from "../../assets/educationIcon/4.png";
+import logo1 from "../../assets/educationIcon/1.webp";
+import logo2 from "../../assets/educationIcon/2.webp";
+import logo3 from "../../assets/educationIcon/3.webp";
+import logo4 from "../../assets/educationIcon/4.webp";
 
-const educationData = [
-  {
-    date: "2021 - 2025",
-    logo: logo4,
-    position: "Sanata Dharma University",
-    companyName: "Sleman, Special Region of Yogyakarta",
-    photo: new URL("../../assets/educationIcon/UNIV.png", import.meta.url).href,
-  },
-  {
-    date: "2018 - 2021",
-    logo: logo3,
-    position: "Public Senior High School 02 Dente Teladas",
-    companyName: "Tulang Bawang, Lampung",
-    photo: new URL("../../assets/educationIcon/SMA.png", import.meta.url).href,
-  },
-  {
-    date: "2015 - 2018",
-    logo: logo2,
-    position: "Public Junior High School 01 Dente Teladas",
-    companyName: "Tulang Bawang, Lampung",
-    photo: new URL("../../assets/educationIcon/SMP.png", import.meta.url).href,
-  },
-  {
-    date: "2009 - 2015",
-    logo: logo1,
-    position: "Public Elementary School 01 Pasiran Jaya",
-    companyName: "Tulang Bawang, Lampung",
-    photo: new URL("../../assets/educationIcon/SD.png", import.meta.url).href,
-  },
-];
+const cardColors = ["#1a1a22", "#161621", "#1a1a2a", "#12121a"]; // Sedikit disesuaikan agar lebih senada
 
-const cardColors = ["#1a1a2e", "#16213e", "#0f3460", "#1b1b2f"];
+function useReveal(threshold = 0.15) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
 
-// ─────────────────────────────────────────────
-// GRADIENTTEXT
-// ─────────────────────────────────────────────
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          obs.unobserve(el);
+        }
+      },
+      { threshold },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+
+  return [ref, visible];
+}
+
+const Education = () => {
+  const { t } = useTranslation();
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [screenSize, setScreenSize] = useState("xl");
+
+  const [headingRef, headingVisible] = useReveal(0.2);
+
+  // Data dengan mapping ke i18n
+  const educationData = [
+    {
+      logo: logo4,
+      photo: new URL("../../assets/educationIcon/UNIV.webp", import.meta.url)
+        .href,
+      ...t("education_items.0", { returnObjects: true }),
+    },
+    {
+      logo: logo3,
+      photo: new URL("../../assets/educationIcon/SMA.webp", import.meta.url)
+        .href,
+      ...t("education_items.1", { returnObjects: true }),
+    },
+    {
+      logo: logo2,
+      photo: new URL("../../assets/educationIcon/SMP.webp", import.meta.url)
+        .href,
+      ...t("education_items.2", { returnObjects: true }),
+    },
+    {
+      logo: logo1,
+      photo: new URL("../../assets/educationIcon/SD.webp", import.meta.url)
+        .href,
+      ...t("education_items.3", { returnObjects: true }),
+    },
+  ];
+
+  useEffect(() => {
+    const update = () => {
+      const w = window.innerWidth;
+      if (w <= 320) setScreenSize("xs");
+      else if (w <= 480) setScreenSize("sm");
+      else if (w <= 768) setScreenSize("md");
+      else if (w <= 1024) setScreenSize("lg");
+      else setScreenSize("xl");
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const logoSize = { xs: 40, sm: 44, md: 50, lg: 56, xl: 64 }[screenSize];
+  const gap = {
+    xs: "0.6rem",
+    sm: "0.8rem",
+    md: "1rem",
+    lg: "1.25rem",
+    xl: "1.5rem",
+  }[screenSize];
+  const padding = {
+    xs: "1rem 1rem",
+    sm: "1.1rem 1.25rem",
+    md: "1.25rem 1.5rem",
+    lg: "1.4rem 1.75rem",
+    xl: "1.5rem 2rem",
+  }[screenSize];
+  const titleSize = {
+    xs: "0.75rem",
+    sm: "0.82rem",
+    md: "0.9rem",
+    lg: "0.96rem",
+    xl: "1rem",
+  }[screenSize];
+  const subSize = {
+    xs: "0.65rem",
+    sm: "0.7rem",
+    md: "0.75rem",
+    lg: "0.82rem",
+    xl: "0.85rem",
+  }[screenSize];
+  const dateSize = {
+    xs: "0.6rem",
+    sm: "0.65rem",
+    md: "0.7rem",
+    lg: "0.73rem",
+    xl: "0.75rem",
+  }[screenSize];
+  const hoverTitle = {
+    xs: "0.85rem",
+    sm: "0.9rem",
+    md: "0.95rem",
+    lg: "1rem",
+    xl: "1.1rem",
+  }[screenSize];
+
+  return (
+    <section id="education">
+      <div
+        ref={headingRef}
+        className="section-title-wrapper"
+        style={{
+          opacity: headingVisible ? 1 : 0,
+          transform: headingVisible ? "translateY(0)" : "translateY(24px)",
+          transition: "opacity 0.7s ease, transform 0.7s ease",
+        }}
+      >
+        <h2
+          className="section-title"
+          style={{
+            margin: 0,
+            fontFamily: "Poppins, sans-serif",
+            fontSize: "clamp(2.6rem, 6vw, 4.2rem)",
+            fontWeight: 800,
+            lineHeight: 1.08,
+          }}
+        >
+          <GradientText
+            colors={["#38bdf8", "#c084fc", "#38bdf8", "#c084fc", "#38bdf8"]}
+            animationSpeed={4}
+          >
+            {t("education.title")}
+          </GradientText>
+        </h2>
+        <p
+          style={{
+            fontFamily: "Poppins, sans-serif",
+            fontSize: "0.9rem",
+            fontWeight: 300,
+            textAlign: "center",
+            color: "#ffffff",
+            lineHeight: 1.75,
+            maxWidth: "700px",
+            margin: "0 auto",
+            marginBottom: "-2px",
+          }}
+        >
+          {t("education.subtitle")}
+        </p>
+      </div>
+
+      <ScrollStack
+        itemDistance={6}
+        itemScale={0.03}
+        itemStackDistance={20}
+        stackPosition="22%"
+        baseScale={0.94}
+      >
+        {educationData.map((item, index) => (
+          <ScrollStackItem key={index}>
+            <div
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+              style={{
+                width: "100%",
+                height: "100%",
+                background: cardColors[index % cardColors.length],
+                borderRadius: "28px",
+                position: "relative",
+                overflow: "hidden",
+                cursor: "pointer",
+              }}
+            >
+              {item.photo && (
+                <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
+                  <img
+                    src={item.photo}
+                    alt=""
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: "-1px",
+                      borderRadius: "28px",
+                      background: `rgba(0,0,0,${hoveredIndex === index ? 0.15 : 0.82})`,
+                      transition: "background 0.4s",
+                    }}
+                  />
+                </div>
+              )}
+
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  gap,
+                  padding,
+                  zIndex: 1,
+                  opacity: hoveredIndex === index ? 0 : 1,
+                  transition: "opacity 0.35s",
+                }}
+              >
+                <img
+                  src={item.logo}
+                  alt={item.position}
+                  style={{
+                    width: logoSize,
+                    height: logoSize,
+                    objectFit: "contain",
+                  }}
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <span
+                    style={{
+                      display: "block",
+                      color: "#38bdf8",
+                      fontSize: dateSize,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {item.date}
+                  </span>
+                  <h3
+                    style={{
+                      color: "#fff",
+                      fontSize: titleSize,
+                      fontWeight: 700,
+                      margin: 0,
+                    }}
+                  >
+                    {item.position}
+                  </h3>
+                  <p style={{ color: "#94a3b8", fontSize: subSize, margin: 0 }}>
+                    {item.companyName}
+                  </p>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "1.5rem",
+                  left: "2rem",
+                  zIndex: 2,
+                  opacity: hoveredIndex === index ? 1 : 0,
+                  transition: "opacity 0.35s",
+                  pointerEvents: "none",
+                }}
+              >
+                <span
+                  style={{
+                    color: "#38bdf8",
+                    fontSize: dateSize,
+                    fontWeight: 600,
+                    textShadow:
+                      "0 0 12px rgba(56,189,248,0.75), 0 2px 8px rgba(0,0,0,0.6)",
+                  }}
+                >
+                  {item.date}
+                </span>
+                <p
+                  style={{
+                    color: "#fff",
+                    fontSize: hoverTitle,
+                    fontWeight: 700,
+                    margin: 0,
+                    textShadow:
+                      "0 0 16px rgba(255,255,255,0.35), 0 2px 10px rgba(0,0,0,0.8)",
+                  }}
+                >
+                  {item.position}
+                </p>
+              </div>
+            </div>
+          </ScrollStackItem>
+        ))}
+      </ScrollStack>
+    </section>
+  );
+};
+
 function GradientText({
   children,
+  className = "",
   colors = ["#38bdf8", "#c084fc", "#38bdf8", "#c084fc", "#38bdf8"],
   animationSpeed = 4,
+  showBorder = false,
   pauseOnHover = false,
   yoyo = true,
 }) {
@@ -70,17 +337,18 @@ function GradientText({
       lastTimeRef.current = time;
       return;
     }
-    const delta = time - lastTimeRef.current;
+    const deltaTime = time - lastTimeRef.current;
     lastTimeRef.current = time;
-    elapsedRef.current += delta;
+    elapsedRef.current += deltaTime;
     if (yoyo) {
       const fullCycle = animationDuration * 2;
-      const ct = elapsedRef.current % fullCycle;
-      progress.set(
-        ct < animationDuration
-          ? (ct / animationDuration) * 100
-          : 100 - ((ct - animationDuration) / animationDuration) * 100,
-      );
+      const cycleTime = elapsedRef.current % fullCycle;
+      if (cycleTime < animationDuration)
+        progress.set((cycleTime / animationDuration) * 100);
+      else
+        progress.set(
+          100 - ((cycleTime - animationDuration) / animationDuration) * 100,
+        );
     } else {
       progress.set((elapsedRef.current / animationDuration) * 100);
     }
@@ -92,263 +360,46 @@ function GradientText({
   }, [animationSpeed, progress, yoyo]);
 
   const backgroundPosition = useTransform(progress, (p) => `${p}% 50%`);
+  const handleMouseEnter = useCallback(() => {
+    if (pauseOnHover) setIsPaused(true);
+  }, [pauseOnHover]);
+  const handleMouseLeave = useCallback(() => {
+    if (pauseOnHover) setIsPaused(false);
+  }, [pauseOnHover]);
+
+  const gradientColors = [...colors, colors[0]].join(", ");
+  const gradientStyle = {
+    backgroundImage: `linear-gradient(to right, ${gradientColors})`,
+    backgroundSize: "300% 100%",
+    backgroundRepeat: "repeat",
+  };
 
   return (
-    <motion.span
-      onMouseEnter={() => pauseOnHover && setIsPaused(true)}
-      onMouseLeave={() => pauseOnHover && setIsPaused(false)}
-      style={{
-        backgroundImage: `linear-gradient(to right, ${[...colors, colors[0]].join(", ")})`,
-        backgroundSize: "300% 100%",
-        backgroundRepeat: "repeat",
-        WebkitBackgroundClip: "text",
-        WebkitTextFillColor: "transparent",
-        backgroundClip: "text",
-        display: "inline-block",
-        backgroundPosition,
-      }}
+    <motion.div
+      className={`animated-gradient-text ${showBorder ? "with-border" : ""} ${className}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      style={{ textAlign: "center", width: "100%" }} // ← override lokal
     >
-      {children}
-    </motion.span>
-  );
-}
-
-// ─────────────────────────────────────────────
-// EDUCATION
-// ─────────────────────────────────────────────
-const Education = () => {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-
-  return (
-    <section
-      id="education"
-      style={{ width: "100%", scrollMarginTop: "80px", position: "relative" }}
-    >
-      {/* Header */}
-      <div
+      {showBorder && (
+        <motion.div
+          className="gradient-overlay"
+          style={{ ...gradientStyle, backgroundPosition }}
+        />
+      )}
+      <motion.div
+        className="text-content"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          paddingTop: "2rem",
+          ...gradientStyle,
+          backgroundPosition,
+          textAlign: "center", // ← override lokal
+          width: "100%", // ← override lokal
         }}
       >
-        <h2
-          className="section-title"
-          style={{
-            margin: 0,
-            fontSize: "clamp(2.6rem, 6vw, 4.2rem)",
-            fontWeight: 800,
-            lineHeight: 1.08,
-          }}
-        >
-          <GradientText
-            colors={["#38bdf8", "#c084fc", "#38bdf8", "#c084fc", "#38bdf8"]}
-            animationSpeed={4}
-          >
-            My Education
-          </GradientText>
-        </h2>
-        <p
-          className="exp-subtitle"
-          style={{
-            color: "#ffffff",
-            textAlign: "center",
-            margin: "26px auto 0",
-          }}
-        >
-          The following outlines my educational journey.
-        </p>
-      </div>
-
-      {/* ScrollStack */}
-      <ScrollStack
-        itemDistance={6}
-        itemScale={0.03}
-        itemStackDistance={20}
-        stackPosition="22%"
-        scaleEndPosition="10%"
-        baseScale={0.94}
-        useWindowScroll={true}
-      >
-        {educationData.map((item, index) => {
-          const isHovered = hoveredIndex === index;
-
-          return (
-            <ScrollStackItem key={index}>
-              <div
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  background: cardColors[index % cardColors.length],
-                  borderRadius: "28px",
-                  boxSizing: "border-box",
-                  border: "none", // ← hapus border
-                  position: "relative",
-                  overflow: "hidden",
-                  cursor: "pointer",
-                  clipPath: "inset(0 round 28px)",
-                  isolation: "isolate", // ← tambahkan
-                  WebkitMaskImage: "-webkit-radial-gradient(white, black)", // ← fix Safari
-                  transform: "translateZ(0)",
-                }}
-              >
-                {/* ── FOTO BACKGROUND ── */}
-                {item.photo && (
-                  <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-                    <img
-                      src={item.photo}
-                      alt=""
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        objectPosition: "center",
-                        display: "block",
-                        borderRadius: "28px",
-                      }}
-                    />
-                    {/* Overlay: gelap (0.82) saat normal, terang (0.15) saat hover */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: "-1px",
-                        borderRadius: "28px",
-                        background: `rgba(0,0,0,${isHovered ? 0.15 : 0.82})`,
-                        transition: "background 0.4s ease",
-                      }}
-                    />
-                  </div>
-                )}
-
-                {/* ── KONTEN TEKS (hilang saat hover) ── */}
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "1.5rem",
-                    padding: "1.5rem 2rem",
-                    zIndex: 1,
-                    opacity: isHovered ? 0 : 1,
-                    transform: isHovered ? "translateY(8px)" : "translateY(0)",
-                    transition: "opacity 0.35s ease, transform 0.35s ease",
-                    pointerEvents: "none",
-                  }}
-                >
-                  {/* Logo */}
-                  <div
-                    style={{
-                      width: "64px",
-                      height: "64px",
-                      flexShrink: 0,
-                      borderRadius: "12px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <img
-                      src={item.logo}
-                      alt={item.position}
-                      style={{
-                        width: "48px",
-                        height: "48px",
-                        objectFit: "contain",
-                      }}
-                    />
-                  </div>
-                  {/* Teks */}
-                  <div style={{ flex: 1 }}>
-                    <span
-                      style={{
-                        display: "inline-block",
-                        color: "#38bdf8",
-                        fontSize: "0.75rem",
-                        fontWeight: 600,
-                        marginBottom: "0.4rem",
-                        letterSpacing: "0.04em",
-                      }}
-                    >
-                      {item.date}
-                    </span>
-                    <h3
-                      style={{
-                        color: "#fff",
-                        fontSize: "1rem",
-                        fontWeight: 700,
-                        margin: "0 0 0.3rem",
-                        lineHeight: 1.3,
-                      }}
-                    >
-                      {item.position}
-                    </h3>
-                    <p
-                      style={{
-                        color: "#94a3b8",
-                        fontSize: "0.85rem",
-                        margin: 0,
-                      }}
-                    >
-                      {item.companyName}
-                    </p>
-                  </div>
-                </div>
-
-                {/* ── LABEL HOVER (muncul di pojok bawah) ── */}
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "1.5rem",
-                    left: "2rem",
-                    zIndex: 2,
-                    opacity: isHovered ? 1 : 0,
-                    transform: isHovered ? "translateY(0)" : "translateY(10px)",
-                    transition: "opacity 0.35s ease, transform 0.35s ease",
-                    pointerEvents: "none",
-                  }}
-                >
-                  <span
-                    style={{
-                      display: "block",
-                      color: "#38bdf8",
-                      fontSize: "0.75rem",
-                      fontWeight: 600,
-                      letterSpacing: "0.04em",
-                      marginBottom: "0.3rem",
-                      // ← shadow pada date saat hover
-                      textShadow:
-                        "0 2px 10px rgba(10, 42, 56, 0.7), 0 0 20px rgba(11, 38, 50, 0.3)",
-                    }}
-                  >
-                    {item.date}
-                  </span>
-                  <p
-                    style={{
-                      color: "#fff",
-                      fontSize: "1.1rem",
-                      fontWeight: 700,
-                      margin: 0,
-                      lineHeight: 1.3,
-                      // ← shadow pada nama posisi saat hover
-                      textShadow:
-                        "0 2px 16px rgba(0,0,0,0.9), 0 4px 24px rgba(0,0,0,0.6)",
-                    }}
-                  >
-                    {item.position}
-                  </p>
-                </div>
-              </div>
-            </ScrollStackItem>
-          );
-        })}
-      </ScrollStack>
-    </section>
+        {children}
+      </motion.div>
+    </motion.div>
   );
-};
+}
 
 export default Education;

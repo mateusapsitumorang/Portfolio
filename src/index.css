@@ -1,6 +1,78 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 
+/* ══════════════════════════════════════════
+   GLOBAL TITLE SPACING (ubah di sini saja)
+══════════════════════════════════════════ */
+:root {
+  --section-title-space-top: 100px;
+  --section-title-space-bottom: 36px;
+  --section-title-gap: 10px;
+}
+
+.section-title-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-title-gap);
+  margin-top: var(--section-title-space-top);
+  margin-bottom: var(--section-title-space-bottom);
+  width: 100%;
+}
+
+#contact .section-title-wrapper>div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 100px;
+}
+
+#contact .section-title-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+@media (max-width: 1279px) {
+  :root {
+    --section-title-space-top: 36px;
+    --section-title-space-bottom: 10px;
+  }
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --section-title-space-top: 90px;
+    --section-title-space-bottom: 10px;
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    --section-title-space-top: 58px;
+    --section-title-space-bottom: 8px;
+    --section-title-gap: 4px;
+  }
+}
+
+@media (max-width: 479px) {
+  :root {
+    --section-title-space-top: 56px;
+    --section-title-space-bottom: 6px;
+  }
+}
+
+@media (max-width: 319px) {
+  :root {
+    --section-title-space-top: 20px;
+    --section-title-space-bottom: 6px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   RESET & BASE
+══════════════════════════════════════════ */
 * {
   margin: 0;
   padding: 0;
@@ -8,8 +80,10 @@
 }
 
 html {
-  scroll-behavior: smooth;
-  overflow-x: hidden;
+  /* DIHAPUS: scroll-behavior: smooth — konflik dengan framer-motion,
+     bikin scroll janky. Smooth scroll dihandle JS bila perlu. */
+  overflow-x: clip;
+  /* clip tidak bikin new stacking context seperti hidden */
   -webkit-text-size-adjust: 100%;
 }
 
@@ -17,52 +91,63 @@ body {
   font-family: 'Poppins', sans-serif;
   background-color: #050505;
   color: #ffffff;
-  overflow-x: hidden;
+  overflow-x: clip;
+  /* clip, bukan hidden — hindari layout recalculation */
   min-width: 0;
   line-height: 1.5;
 }
 
-/* Memperbaiki root agar full-screen */
 #root {
   width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  /* DIHAPUS: overflow-x: hidden — tidak perlu, body sudah handle */
 }
 
+/* ══════════════════════════════════════════
+   CONTAINER
+══════════════════════════════════════════ */
 .container {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 100px 20px;
+  padding-left: 20px;
+  padding-right: 20px;
   position: relative;
   z-index: 10;
   box-sizing: border-box;
 }
 
+/* ══════════════════════════════════════════
+   SECTION
+══════════════════════════════════════════ */
 section {
   width: 100%;
-  min-height: 100vh;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   box-sizing: border-box;
 }
 
+/* ══════════════════════════════════════════
+   TITLE STYLES
+══════════════════════════════════════════ */
 h2.section-title {
   font-size: clamp(2rem, 5vw, 3.5rem);
   text-align: center;
-  margin-bottom: clamp(30px, 5vw, 50px);
   background: linear-gradient(90deg, #38bdf8, #c084fc);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-weight: 800;
   line-height: 1.2;
+  margin: 0;
 }
 
-/* Style Khusus untuk BlurText "Selamat Datang" */
 .welcome-text {
   font-size: clamp(2rem, 5vw, 3.5rem);
   font-weight: 800;
@@ -74,16 +159,9 @@ h2.section-title {
   word-break: break-word;
 }
 
-/* Memastikan semua section mengikuti lebar yang sama */
-section {
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 20px;
-  box-sizing: border-box;
-}
-
-/* Prevent horizontal scroll on all elements */
+/* ══════════════════════════════════════════
+   MEDIA & TYPOGRAPHY HELPERS
+══════════════════════════════════════════ */
 img,
 video,
 iframe {
@@ -91,7 +169,6 @@ iframe {
   height: auto;
 }
 
-/* Fix for flex/grid overflow */
 .flex,
 .grid,
 [class*="flex"],
@@ -99,7 +176,6 @@ iframe {
   min-width: 0;
 }
 
-/* Ensure text doesn't overflow */
 p,
 span,
 h1,
@@ -115,67 +191,197 @@ li {
   hyphens: auto;
 }
 
-/* ── Gap antar section ── */
-.container {
-  padding-top: 120px;
-  /* jarak atas — ubah sesuai selera */
-  padding-bottom: 120px;
-  /* jarak bawah */
+/* ── CV iframe height ── */
+.cv-iframe {
+  height: 780px;
+  width: 100%;
 }
 
 @media (max-width: 1024px) {
-  .container {
-    padding-top: 90px;
+  .cv-iframe {
+    height: 680px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .cv-iframe {
+    height: 560px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .cv-iframe {
+    height: 420px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .cv-iframe {
+    height: 360px;
+    width: 100%;
+  }
+}
+
+.cv-wrapper {
+  max-width: 900px;
+}
+
+@media (max-width: 1024px) {
+  .cv-wrapper {
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 768px) {
+  .cv-wrapper {
+    max-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cv-wrapper {
+    max-width: 300px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   SCROLL MARGIN
+══════════════════════════════════════════ */
+#about,
+#experience,
+#projects,
+#cv,
+#education,
+#certificates,
+#contact {
+  scroll-margin-top: 92px;
+}
+
+@media (max-width: 1279px) {
+
+  #about,
+  #experience,
+  #projects,
+  #cv,
+  #education,
+  #certificates,
+  #contact {
+    scroll-margin-top: 84px;
+  }
+}
+
+@media (max-width: 1023px) {
+
+  #about,
+  #experience,
+  #projects,
+  #cv,
+  #education,
+  #certificates,
+  #contact {
+    scroll-margin-top: 72px;
+  }
+}
+
+@media (max-width: 767px) {
+
+  #about,
+  #experience,
+  #projects,
+  #cv,
+  #education,
+  #certificates,
+  #contact {
+    scroll-margin-top: 66px;
+  }
+}
+
+@media (max-width: 479px) {
+
+  #about,
+  #experience,
+  #projects,
+  #cv,
+  #education,
+  #certificates,
+  #contact {
+    scroll-margin-top: 60px;
+  }
+}
+
+@media (max-width: 319px) {
+
+  #about,
+  #experience,
+  #projects,
+  #cv,
+  #education,
+  #certificates,
+  #contact {
+    scroll-margin-top: 54px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   SECTION BOTTOM PADDING
+══════════════════════════════════════════ */
+.exp-section,
+#projects.container {
+  padding-top: 0;
+  padding-bottom: 6rem;
+}
+
+@media (max-width: 1279px) {
+
+  .exp-section,
+  #projects.container {
+    padding-bottom: 100px;
+  }
+}
+
+@media (max-width: 1023px) {
+
+  .exp-section,
+  #projects.container {
     padding-bottom: 90px;
   }
 }
 
-@media (max-width: 768px) {
-  .container {
-    padding-top: 70px;
+@media (max-width: 767px) {
+
+  .exp-section,
+  #projects.container {
     padding-bottom: 70px;
   }
 }
 
-@media (max-width: 480px) {
-  .container {
-    padding-top: 50px;
+@media (max-width: 479px) {
+
+  .exp-section,
+  #projects.container {
     padding-bottom: 50px;
   }
 }
 
-/* ── CV iframe height ── */
-.cv-iframe {
-  height: 600px;
-}
+@media (max-width: 319px) {
 
-@media (max-width: 1024px) {
-  .cv-iframe {
-    height: 900px;
+  .exp-section,
+  #projects.container {
+    padding-bottom: 40px;
   }
 }
 
-@media (max-width: 768px) {
-  .cv-iframe {
-    height: 700px;
-  }
-}
-
-@media (max-width: 480px) {
-  .cv-iframe {
-    height: 500px;
-  }
-}
-
-/* ============================================
-   RESPONSIVE BREAKPOINTS
-   ============================================ */
-
-/* Large Desktop: > 1440px */
+/* ══════════════════════════════════════════
+   RESPONSIVE CONTAINER WIDTH
+══════════════════════════════════════════ */
 @media (min-width: 1441px) {
   .container {
     max-width: 1200px;
-    padding: 80px 120px;
+    padding-left: 120px;
+    padding-right: 120px;
   }
 
   section {
@@ -192,11 +398,11 @@ li {
   }
 }
 
-/* Desktop: 1025px - 1440px */
 @media (min-width: 1025px) and (max-width: 1440px) {
   .container {
     max-width: 1100px;
-    padding: 100px 30px;
+    padding-left: 30px;
+    padding-right: 30px;
   }
 
   section {
@@ -205,11 +411,11 @@ li {
   }
 }
 
-/* Tablet Landscape: 1024px */
 @media (max-width: 1024px) and (min-width: 769px) {
   .container {
     max-width: 100%;
-    padding: 80px 24px;
+    padding-left: 24px;
+    padding-right: 24px;
   }
 
   section {
@@ -219,7 +425,6 @@ li {
 
   h2.section-title {
     font-size: clamp(2rem, 4vw, 2.8rem);
-    margin-bottom: clamp(24px, 4vw, 40px);
   }
 
   .welcome-text {
@@ -227,20 +432,18 @@ li {
   }
 }
 
-/* Tablet Portrait / Mobile Landscape: 768px */
 @media (max-width: 768px) {
   .container {
-    padding: 60px 16px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   section {
     padding: 0 16px;
-    min-height: auto;
   }
 
   h2.section-title {
     font-size: clamp(1.75rem, 5vw, 2.25rem);
-    margin-bottom: clamp(20px, 4vw, 32px);
   }
 
   .welcome-text {
@@ -258,10 +461,10 @@ li {
   }
 }
 
-/* Mobile: 480px - 768px */
 @media (max-width: 768px) and (min-width: 481px) {
   .container {
-    padding: 60px 20px;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
   section {
@@ -269,10 +472,10 @@ li {
   }
 }
 
-/* Small Mobile: ≤ 480px */
 @media (max-width: 480px) {
   .container {
-    padding: 50px 12px;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   section {
@@ -285,14 +488,13 @@ li {
 
   h2.section-title {
     font-size: clamp(1.3rem, 6vw, 1.8rem);
-    margin-bottom: 20px;
   }
 }
 
-/* Extra Small: ≤ 360px */
 @media (max-width: 360px) {
   .container {
-    padding: 40px 10px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   section {
@@ -305,11 +507,10 @@ li {
 
   h2.section-title {
     font-size: clamp(1.1rem, 7vw, 1.5rem);
-    margin-bottom: 16px;
   }
 }
 
-/* Touch device optimizations */
+/* ── Touch device optimizations ── */
 @media (hover: none) and (pointer: coarse) {
 
   .nav-links a:hover,
@@ -322,7 +523,6 @@ li {
     box-shadow: none;
   }
 
-  /* Increase tap targets */
   a,
   button,
   input,
@@ -331,7 +531,7 @@ li {
   }
 }
 
-/* Reduced motion */
+/* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
 
   *,
@@ -344,7 +544,7 @@ li {
   }
 }
 
-/* High contrast mode */
+/* ── High contrast mode ── */
 @media (prefers-contrast: high) {
 
   .floating-navbar,
@@ -359,7 +559,7 @@ li {
   }
 }
 
-/* Print styles */
+/* ── Print styles ── */
 @media print {
 
   .floating-navbar,
@@ -370,7 +570,6 @@ li {
   }
 
   section {
-    min-height: auto;
     page-break-inside: avoid;
   }
 
