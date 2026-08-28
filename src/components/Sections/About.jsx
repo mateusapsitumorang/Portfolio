@@ -5,7 +5,7 @@ import "../lib/TextType/TextType.css";
 import BlurText from "../lib/BlurText/BlurText";
 import DecryptedText from "../lib/DecryptedText/DecryptedText";
 import UiverseCard from "../lib/UiverseCard/UiverseCard";
-import "./About.css"; // <-- CSS statis, tidak lagi di-inject via <style> tiap render
+import "./About.css";
 
 import myPhoto from "../../assets/pic1.webp";
 import myPhotoHover from "../../assets/pic2.webp";
@@ -24,10 +24,11 @@ const About = () => {
           <div className="about-welcome-wrap">
             <TextType
               text={[t("about.welcome")]}
-              typingSpeed={100}
+              typingSpeed={10}
               showCursor={true}
               cursorCharacter="|"
               className="welcome-text"
+              loop={false}
             />
           </div>
 

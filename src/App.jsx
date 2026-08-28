@@ -3,8 +3,6 @@ import LightRays from "./components/lib/LightRays/LightRays";
 import GradualBlur from "./components/lib/GradualBlur/GradualBlur";
 
 import Navbar from "./components/layout/Navbar";
-// Tambahkan baris import Footer di bawah ini
-// (Sesuaikan "layout" atau "sections" dengan nama folder tempat Anda menyimpan Footer.jsx)
 import ScrollToTop from "./components/lib/ScrollToTop/ScrollToTop";
 import Experience from "./components/Sections/Experience";
 import About from "./components/sections/About";

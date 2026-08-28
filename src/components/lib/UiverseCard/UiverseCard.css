@@ -2,7 +2,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
+    width: 10%;
 }
 
 .frost-wrap {
@@ -13,7 +13,6 @@
     box-shadow:
         0 8px 32px rgba(0, 0, 0, 0.45),
         inset 0 1px 0 rgba(255, 255, 255, 0.12);
-    /* tidak perlu will-change, wrap ini statis, tidak animasi */
 }
 
 .card {
@@ -33,65 +32,25 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    /* will-change dihapus dari default state */
+    transition: opacity 0.25s ease;
 }
 
 .card__img--default {
     z-index: 1;
     opacity: 1;
-    transform: scale(1);
 }
 
 .card__img--hover {
     z-index: 2;
     opacity: 0;
-    transform: scale(1.2);
 }
 
-/* will-change HANYA dipasang selama animasi berjalan */
-.motion-in,
-.motion-out {
-    will-change: transform, opacity;
+.card:hover .card__img--default {
+    opacity: 0;
 }
 
-@keyframes motionBlurIn {
-    0% {
-        transform: scale(1.25);
-        opacity: 0;
-    }
-
-    40% {
-        opacity: 0.6;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-@keyframes motionBlurOut {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-    40% {
-        opacity: 0.4;
-    }
-
-    100% {
-        transform: scale(1.25);
-        opacity: 0;
-    }
-}
-
-.motion-in {
-    animation: motionBlurIn 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-}
-
-.motion-out {
-    animation: motionBlurOut 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+.card:hover .card__img--hover {
+    opacity: 1;
 }
 
 /* ── RESPONSIVE — digabung, tidak ada duplikat range ── */
@@ -162,15 +121,12 @@
 
     .card__img--hover {
         opacity: 0.3;
-        transform: scale(1.1);
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-
-    .motion-in,
-    .motion-out {
-        animation-duration: 0.01ms !important;
+    .card__img {
+        transition: none;
     }
 }
 

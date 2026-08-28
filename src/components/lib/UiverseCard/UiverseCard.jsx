@@ -1,39 +1,18 @@
-import React, { useState, useCallback } from "react";
+import React from "react";
 import "./UiverseCard.css";
 
 const UiverseCard = ({ imageSrc, hoverImageSrc }) => {
-  const [state, setState] = useState("idle"); // "idle" | "entering" | "leaving"
-
-  const handleMouseEnter = useCallback(() => setState("entering"), []);
-  const handleMouseLeave = useCallback(() => setState("leaving"), []);
-
-  // Lepas will-change begitu animasi selesai, biar layer GPU-nya dilepas lagi
-  const handleAnimEnd = useCallback((e) => {
-    e.currentTarget.style.willChange = "auto";
-  }, []);
-
   return (
     <div className="card-container">
       <div className="frost-wrap">
-        <div
-          className="card"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
+        <div className="card">
           <img
             src={imageSrc}
             alt="Profile"
             width={220}
             height={320}
             decoding="async"
-            className={`card__img card__img--default ${
-              state === "entering"
-                ? "motion-out"
-                : state === "leaving"
-                  ? "motion-in"
-                  : ""
-            }`}
-            onAnimationEnd={handleAnimEnd}
+            className="card__img card__img--default"
           />
           <img
             src={hoverImageSrc}
@@ -42,14 +21,7 @@ const UiverseCard = ({ imageSrc, hoverImageSrc }) => {
             height={320}
             decoding="async"
             loading="lazy"
-            className={`card__img card__img--hover ${
-              state === "entering"
-                ? "motion-in"
-                : state === "leaving"
-                  ? "motion-out"
-                  : ""
-            }`}
-            onAnimationEnd={handleAnimEnd}
+            className="card__img card__img--hover"
           />
         </div>
       </div>

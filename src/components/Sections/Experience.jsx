@@ -11,17 +11,6 @@ import "./Experience.css";
 import LogoBSSN from "../../assets/LogoBSSN.webp";
 
 /* ════════════════════════════════════════════════════════════
-   SHAPEGRID — CSS-ONLY, NO RAF, NO JS PER FRAME!
-   ════════════════════════════════════════════════════════════ */
-function ShapeGrid({ className = "" }) {
-  return (
-    <div className={`shapegrid-container ${className}`}>
-      <div className="shapegrid-canvas-css" />
-    </div>
-  );
-}
-
-/* ════════════════════════════════════════════════════════════
    SPOTLIGHT CARD
    ════════════════════════════════════════════════════════════ */
 function SpotlightCard({
@@ -67,40 +56,6 @@ function SpotlightCard({
       className={`card-spotlight ${className}`}
     >
       {children}
-    </div>
-  );
-}
-
-/* ════════════════════════════════════════════════════════════
-   GRADIENT TEXT — keyframe sudah statis di Experience.css,
-   tidak perlu lagi inject <style> manual ke document.head
-   ════════════════════════════════════════════════════════════ */
-function GradientText({
-  children,
-  className = "",
-  colors = ["#38bdf8", "#c084fc", "#38bdf8", "#c084fc", "#38bdf8"],
-  animationSpeed = 4,
-  showBorder = false,
-}) {
-  const gradientStyle = useMemo(() => {
-    const gradientColors = [...colors, colors[0]].join(", ");
-    return {
-      backgroundImage: `linear-gradient(to right, ${gradientColors})`,
-      backgroundSize: "300% 100%",
-      backgroundRepeat: "repeat",
-      animation: `gradientShift ${animationSpeed * 2}s ease infinite`,
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [colors.join(","), animationSpeed]);
-
-  return (
-    <div
-      className={`animated-gradient-text ${showBorder ? "with-border" : ""} ${className}`}
-    >
-      {showBorder && <div className="gradient-overlay" style={gradientStyle} />}
-      <div className="text-content" style={gradientStyle}>
-        {children}
-      </div>
     </div>
   );
 }
@@ -316,15 +271,7 @@ function SectionHeading() {
       ref={ref}
       className={`section-title-wrapper exp-heading ${visible ? "exp-visible" : ""}`}
     >
-      <h2 className="exp-title">
-        <GradientText
-          colors={["#38bdf8", "#c084fc", "#38bdf8", "#c084fc", "#38bdf8"]}
-          animationSpeed={4}
-          showBorder={false}
-        >
-          {t("experience.title")}
-        </GradientText>
-      </h2>
+      <h2 className="exp-title">{t("experience.title")}</h2>
       <p className="exp-subtitle">{t("experience.subtitle")}</p>
     </div>
   );
@@ -337,8 +284,6 @@ export default function Experience() {
   const { t } = useTranslation();
   const lineRef = useRef(null);
 
-  // Dulu array ini dibangun ulang di SETIAP render + tiap kali t() dipanggil.
-  // Sekarang cuma dihitung ulang kalau t (bahasa) berubah.
   const EXPERIENCES = useMemo(
     () => [
       {
@@ -399,10 +344,6 @@ export default function Experience() {
 
   return (
     <section className="exp-section" id="experience">
-      <div className="exp-bg">
-        <ShapeGrid />
-      </div>
-
       <div className="exp-bg-orb exp-bg-orb-1" />
       <div className="exp-bg-orb exp-bg-orb-2" />
 

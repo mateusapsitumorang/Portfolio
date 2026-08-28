@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState, useMemo } from "react";
 
-// Dipindah ke luar — tidak perlu dibuat ulang tiap render
 const buildKeyframes = (from, steps) => {
   const keys = new Set([
     ...Object.keys(from),
@@ -37,7 +36,7 @@ const BlurText = ({
       ([entry]) => {
         if (entry.isIntersecting) {
           setInView(true);
-          observer.disconnect(); // langsung disconnect, tidak perlu unobserve
+          observer.disconnect();
         }
       },
       { threshold, rootMargin },
@@ -46,24 +45,24 @@ const BlurText = ({
     return () => observer.disconnect();
   }, [threshold, rootMargin]);
 
-  // Pisah split dari render — tidak perlu dibuat ulang kecuali text/animateBy berubah
   const elements = useMemo(
     () => (animateBy === "words" ? text.split(" ") : text.split("")),
     [text, animateBy],
   );
 
+  // ── PERUBAHAN: hapus filter: blur() dari animasi ──
+  // Efek "blur" divisualkan cukup lewat opacity + sedikit pergeseran y,
+  // jauh lebih murah untuk browser (cukup compositing, tanpa filter pass)
   const defaultFrom = useMemo(
     () =>
-      direction === "top"
-        ? { filter: "blur(10px)", opacity: 0, y: -50 }
-        : { filter: "blur(10px)", opacity: 0, y: 50 },
+      direction === "top" ? { opacity: 0, y: -50 } : { opacity: 0, y: 50 },
     [direction],
   );
 
   const defaultTo = useMemo(
     () => [
-      { filter: "blur(5px)", opacity: 0.5, y: direction === "top" ? 5 : -5 },
-      { filter: "blur(0px)", opacity: 1, y: 0 },
+      { opacity: 0.5, y: direction === "top" ? 5 : -5 },
+      { opacity: 1, y: 0 },
     ],
     [direction],
   );
@@ -71,15 +70,14 @@ const BlurText = ({
   const fromSnapshot = animationFrom ?? defaultFrom;
   const toSnapshots = animationTo ?? defaultTo;
 
-  // Hitung keyframes & timing sekali — bukan di dalam .map()
-  const { animateKeyframes, stepCount, totalDuration, times } = useMemo(() => {
+  const { animateKeyframes, totalDuration, times } = useMemo(() => {
     const kf = buildKeyframes(fromSnapshot, toSnapshots);
     const sc = toSnapshots.length + 1;
     const td = stepDuration * (sc - 1);
     const t = Array.from({ length: sc }, (_, i) =>
       sc === 1 ? 0 : i / (sc - 1),
     );
-    return { animateKeyframes: kf, stepCount: sc, totalDuration: td, times: t };
+    return { animateKeyframes: kf, totalDuration: td, times: t };
   }, [fromSnapshot, toSnapshots, stepDuration]);
 
   return (
@@ -90,19 +88,25 @@ const BlurText = ({
     >
       {elements.map((segment, index) => (
         <motion.span
-          className="inline-block will-change-[transform,filter,opacity]"
+          className="inline-block"
           key={index}
           initial={fromSnapshot}
           animate={inView ? animateKeyframes : fromSnapshot}
+          // ── PERUBAHAN: will-change HANYA aktif selama animasi berjalan ──
+          // Sebelumnya will-change dipasang permanen lewat className,
+          // sekarang di-set via style dan dilepas begitu animasi selesai
+          style={{ willChange: inView ? "opacity, transform" : "auto" }}
           transition={{
             duration: totalDuration,
             times,
             delay: (index * delay) / 1000,
             ease: easing,
           }}
-          onAnimationComplete={
-            index === elements.length - 1 ? onAnimationComplete : undefined
-          }
+          onAnimationComplete={() => {
+            if (index === elements.length - 1 && onAnimationComplete) {
+              onAnimationComplete();
+            }
+          }}
         >
           {segment === " " ? "\u00A0" : segment}
           {animateBy === "words" && index < elements.length - 1 && "\u00A0"}
