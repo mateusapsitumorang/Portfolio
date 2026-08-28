@@ -4,7 +4,7 @@ import GradualBlur from "./components/lib/GradualBlur/GradualBlur";
 
 import Navbar from "./components/layout/Navbar";
 import ScrollToTop from "./components/lib/ScrollToTop/ScrollToTop";
-import Experience from "./components/Sections/Experience";
+import Experience from "./components/sections/Experience";
 import About from "./components/sections/About";
 import Projects from "./components/sections/Projects";
 import CV from "./components/sections/CV";
