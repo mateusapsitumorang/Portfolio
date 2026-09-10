@@ -1,7 +1,7 @@
 import React from "react";
 import "./UiverseCard.css";
 
-const UiverseCard = ({ imageSrc, hoverImageSrc }) => {
+const UiverseCard = ({ imageSrc }) => {
   return (
     <div className="card-container">
       <div className="frost-wrap">
@@ -12,16 +12,7 @@ const UiverseCard = ({ imageSrc, hoverImageSrc }) => {
             width={220}
             height={320}
             decoding="async"
-            className="card__img card__img--default"
-          />
-          <img
-            src={hoverImageSrc}
-            alt="Profile Hover"
-            width={220}
-            height={320}
-            decoding="async"
-            loading="lazy"
-            className="card__img card__img--hover"
+            className="card__img"
           />
         </div>
       </div>

@@ -8,7 +8,6 @@ import UiverseCard from "../lib/UiverseCard/UiverseCard";
 import "./About.css";
 
 import myPhoto from "../../assets/pic1.webp";
-import myPhotoHover from "../../assets/pic2.webp";
 
 const About = () => {
   const { t } = useTranslation();
@@ -17,7 +16,7 @@ const About = () => {
     <section id="about" className="about-section">
       <div className="about-inner">
         <div className="about-photo-mobile">
-          <UiverseCard imageSrc={myPhoto} hoverImageSrc={myPhotoHover} />
+          <UiverseCard imageSrc={myPhoto} />
         </div>
 
         <div className="about-text">
@@ -63,7 +62,7 @@ const About = () => {
         </div>
 
         <div className="about-photo-desktop">
-          <UiverseCard imageSrc={myPhoto} hoverImageSrc={myPhotoHover} />
+          <UiverseCard imageSrc={myPhoto} />
         </div>
       </div>
     </section>
