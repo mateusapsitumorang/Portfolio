@@ -9,7 +9,7 @@ import {
 import Ferrofluid from "../lib/Ferrofluid/Ferrofluid";
 import LogoLoop from "../lib/LogoLoop/LogoLoop";
 import "../lib/LogoLoop/LogoLoop.css";
-import Footer from "../layout/Footer";
+import Footer from "../Layout/Footer";
 
 import ArkimeLogo from "../../assets/logo/Arkime.webp";
 import GuacamoleLogo from "../../assets/logo/Guacamole.webp";
