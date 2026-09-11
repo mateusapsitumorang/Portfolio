@@ -4,13 +4,13 @@ import GradualBlur from "./components/lib/GradualBlur/GradualBlur";
 
 import Navbar from "./components/Layout/Navbar";
 import ScrollToTop from "./components/lib/ScrollToTop/ScrollToTop";
-import Experience from "./components/sections/Experience";
-import About from "./components/sections/About";
-import Projects from "./components/sections/Projects";
-import CV from "./components/sections/CV";
-import Education from "./components/sections/Education";
-import Certificates from "./components/sections/Certificates";
-import Contact from "./components/sections/Contact";
+import Experience from "./components/Sections/Experience";
+import About from "./components/Sections/About";
+import Projects from "./components/Sections/Projects";
+import CV from "./components/Sections/CV";
+import Education from "./components/Sections/Education";
+import Certificates from "./components/Sections/Certificates";
+import Contact from "./components/Sections/Contact";
 
 function App() {
   return (
