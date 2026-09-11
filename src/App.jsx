@@ -2,7 +2,7 @@ import React from "react";
 import LightRays from "./components/lib/LightRays/LightRays";
 import GradualBlur from "./components/lib/GradualBlur/GradualBlur";
 
-import Navbar from "./components/layout/Navbar";
+import Navbar from "./components/Layout/Navbar";
 import ScrollToTop from "./components/lib/ScrollToTop/ScrollToTop";
 import Experience from "./components/sections/Experience";
 import About from "./components/sections/About";

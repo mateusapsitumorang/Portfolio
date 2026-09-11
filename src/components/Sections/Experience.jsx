@@ -112,6 +112,8 @@ function ExperienceRow({ item, index, isLast }) {
   const [ref, visible] = useReveal(0.1);
   const rowRef = useRef(null);
   const lastMoveTime = useRef(0);
+  const cachedRect = useRef(null);
+  const lastRectTime = useRef(0);
 
   const handleMouseMove = useCallback(
     (e) => {
@@ -121,7 +123,20 @@ function ExperienceRow({ item, index, isLast }) {
 
       const el = rowRef.current;
       if (!el) return;
-      const r = el.getBoundingClientRect();
+
+      // Cache the rect instead of calling getBoundingClientRect() every
+      // tick. That call forces a synchronous layout ("reflow") if any
+      // style write is pending — during scroll, the reveal transition
+      // and the timeline progress bar are both writing styles, so an
+      // uncached read here was forcing layout on every mousemove while
+      // scrolling past this section. Recomputing every 100ms instead is
+      // visually indistinguishable but removes the repeated reflow.
+      const now2 = performance.now();
+      if (!cachedRect.current || now2 - lastRectTime.current > 100) {
+        cachedRect.current = el.getBoundingClientRect();
+        lastRectTime.current = now2;
+      }
+      const r = cachedRect.current;
       const x = e.clientX - r.left;
       const y = e.clientY - r.top;
       const prox = Math.max(
@@ -144,6 +159,7 @@ function ExperienceRow({ item, index, isLast }) {
 
   const handleMouseLeave = useCallback(() => {
     if (rowRef.current) rowRef.current.style.background = "transparent";
+    cachedRect.current = null;
   }, []);
 
   return (

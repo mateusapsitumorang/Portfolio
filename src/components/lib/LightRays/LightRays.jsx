@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import "./LightRays.css";
 
 /**
@@ -27,7 +27,6 @@ const LightRays = ({
   className = "",
 }) => {
   const containerRef = useRef(null);
-  const [mousePos, setMousePos] = useState({ x: 50, y: 10 });
 
   // Konversi hex ke RGB untuk rgba()
   const hexToRgb = (hex) => {
@@ -38,27 +37,54 @@ const LightRays = ({
 
   const rgbColor = hexToRgb(raysColor);
 
-  // Mouse tracking (hanya jika followMouse = true)
+  // Mouse tracking (hanya jika followMouse = true).
+  //
+  // Sebelumnya tiap event mousemove memanggil setState, yang membuat
+  // React me-render ulang seluruh komponen ini (elemen fixed, full-viewport)
+  // di setiap event — bisa ratusan kali per detik pada mouse/trackpad
+  // dengan polling rate tinggi. Ini menumpuk dengan handler mousemove lain
+  // di halaman (mis. spotlight hover di section Experience) dan terasa berat
+  // saat scroll sambil mouse bergerak.
+  //
+  // Sekarang posisi disimpan di ref biasa (bukan state) dan ditulis
+  // langsung ke CSS custom property lewat DOM, dibatasi maksimal satu
+  // update per animation frame (~60fps) — tidak ada re-render React sama
+  // sekali dari pergerakan mouse.
   useEffect(() => {
     if (!followMouse) return;
 
+    const pos = { x: 50, y: 10 };
+    let scheduled = false;
+
+    const applyPos = () => {
+      scheduled = false;
+      const el = containerRef.current;
+      if (!el) return;
+      el.style.setProperty("--mouse-x", `${pos.x}%`);
+      el.style.setProperty("--mouse-y", `${pos.y}%`);
+    };
+
     const handleMouseMove = (e) => {
-      const x = (e.clientX / window.innerWidth) * 100;
-      const y = (e.clientY / window.innerHeight) * 100;
-      setMousePos({ x, y });
+      pos.x = (e.clientX / window.innerWidth) * 100;
+      pos.y = (e.clientY / window.innerHeight) * 100;
+      if (!scheduled) {
+        scheduled = true;
+        requestAnimationFrame(applyPos);
+      }
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [followMouse]);
 
-  // CSS custom properties untuk animasi
+  // CSS custom properties untuk animasi (posisi awal; setelah mount,
+  // --mouse-x/--mouse-y di-update langsung lewat ref di atas)
   const containerStyle = {
     "--rays-color": rgbColor,
     "--rays-speed": `${8 / raysSpeed}s`, // speed 1 = 8s, speed 2 = 4s, speed 0.5 = 16s
     "--rays-opacity": opacity,
-    "--mouse-x": `${mousePos.x}%`,
-    "--mouse-y": `${mousePos.y}%`,
+    "--mouse-x": "50%",
+    "--mouse-y": "10%",
     "--mouse-influence": mouseInfluence,
   };
 

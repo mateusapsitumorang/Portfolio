@@ -24,6 +24,7 @@ const ScrollStack = ({
   const stackCompletedRef = useRef(false);
   const animationFrameRef = useRef(null);
   const lenisRef = useRef(null);
+  const nativeScrollCleanupRef = useRef(null);
   const cardsRef = useRef([]);
   const lastTransformsRef = useRef(new Map());
   const isUpdatingRef = useRef(false);
@@ -123,7 +124,6 @@ const ScrollStack = ({
         translateY: Math.round(translateY * 100) / 100,
         scale: Math.round(scale * 1000) / 1000,
         rotation: Math.round(rotation * 100) / 100,
-        blur: Math.round(blur * 100) / 100,
       };
 
       // ✅ Skip DOM write jika nilai tidak berubah (dari source asli)
@@ -132,13 +132,10 @@ const ScrollStack = ({
         !last ||
         Math.abs(last.translateY - newTransform.translateY) > 0.1 ||
         Math.abs(last.scale - newTransform.scale) > 0.001 ||
-        Math.abs(last.rotation - newTransform.rotation) > 0.1 ||
-        Math.abs(last.blur - newTransform.blur) > 0.1;
+        Math.abs(last.rotation - newTransform.rotation) > 0.1;
 
       if (hasChanged) {
         card.style.transform = `translate3d(0, ${newTransform.translateY}px, 0) scale(${newTransform.scale}) rotate(${newTransform.rotation}deg)`;
-        card.style.filter =
-          newTransform.blur > 0 ? `blur(${newTransform.blur}px)` : "";
         lastTransformsRef.current.set(i, newTransform);
       }
 
@@ -171,26 +168,32 @@ const ScrollStack = ({
 
   const setupLenis = useCallback(() => {
     if (useWindowScroll) {
-      const lenis = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true,
-        touchMultiplier: 2,
-        infinite: false,
-        wheelMultiplier: 1,
-        lerp: 0.1,
-        syncTouch: true,
-        syncTouchLerp: 0.075,
-      });
-
-      lenis.on("scroll", updateCardTransforms);
-
-      const raf = (time) => {
-        lenis.raf(time);
-        animationFrameRef.current = requestAnimationFrame(raf);
+      // IMPORTANT: this used to create a `new Lenis(...)` here with no
+      // `wrapper` option. Without a wrapper, Lenis takes over scrolling
+      // for the ENTIRE page (intercepting wheel/touch input and replacing
+      // native scroll with its own JS-driven, eased "lerp" scroll), plus
+      // a `requestAnimationFrame` loop that ran forever for the whole
+      // session. That is a lot of always-on overhead just to animate one
+      // section's stacked cards, and it's what made scrolling feel choppy
+      // everywhere on the site — not just in Education.
+      //
+      // The stack animation only needs to know the current scroll
+      // position, so a normal passive scroll listener (rAF-throttled,
+      // same pattern used in Experience.jsx) is enough. This keeps the
+      // browser's native, GPU-accelerated scrolling intact everywhere
+      // else on the page.
+      let ticking = false;
+      const onScroll = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          updateCardTransforms();
+          ticking = false;
+        });
       };
-      animationFrameRef.current = requestAnimationFrame(raf);
-      lenisRef.current = lenis;
+      window.addEventListener("scroll", onScroll, { passive: true });
+      nativeScrollCleanupRef.current = () =>
+        window.removeEventListener("scroll", onScroll);
     } else {
       const scroller = scrollerRef.current;
       if (!scroller) return;
@@ -236,7 +239,7 @@ const ScrollStack = ({
       if (i < cards.length - 1) {
         card.style.marginBottom = `${itemDistance}px`;
       }
-      card.style.willChange = "transform, filter";
+      card.style.willChange = "transform";
       card.style.transformOrigin = "top center";
       card.style.backfaceVisibility = "hidden";
       card.style.transform = "translateZ(0)";
@@ -249,6 +252,7 @@ const ScrollStack = ({
       if (animationFrameRef.current)
         cancelAnimationFrame(animationFrameRef.current);
       if (lenisRef.current) lenisRef.current.destroy();
+      if (nativeScrollCleanupRef.current) nativeScrollCleanupRef.current();
       stackCompletedRef.current = false;
       cardsRef.current = [];
       transformsCache.clear();
